@@ -1,0 +1,74 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ main ]  # 推送到主分支时触发
+  # 也可以手动触发
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. 设置 JDK（Java 项目示例）
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      # 3. 构建项目
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      # 4. 上传构建产物到服务器
+      - name: Deploy to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          port: 22
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "target/*.jar"
+          target: "/var/www/sky-take-out/"
+          strip_components: 1
+
+      # 5. 重启服务
+      - name: Deploy with Docker
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          port: 22
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # 清理已有容器和镜像
+            docker stop sky-take-out-backend 2>/dev/null || true
+            docker rm sky-take-out-backend 2>/dev/null || true
+            docker rmi sky-take-out-backend:latest 2>/dev/null || true
+
+            # 构建 Docker 镜像
+            cd /var/www/sky-take-out/
+            cat > Dockerfile << 'DOCKERFILE_END'
+            FROM openjdk:21-slim
+            WORKDIR /app
+            COPY *.jar app.jar
+            EXPOSE 8080
+            CMD ["java", "-jar", "app.jar"]
+            DOCKERFILE_END
+
+            docker build -t sky-take-out-backend:latest .
+
+            # 启动容器
+            docker run -d \
+              --name sky-take-out-backend \
+              -p 8080:8080 \
+              sky-take-out-backend:latest
+
+            echo "Deployment completed at $(date)"
+            docker ps --filter name=sky-take-out-backend
