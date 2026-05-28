@@ -34,9 +34,9 @@ jobs:
           port: 22
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "target/*.jar"
+          source: "sky-take-server/target/*.jar"
           target: "/var/www/sky-take-out/"
-          strip_components: 1
+          strip_components: 2
 
       # 5. 重启服务
       - name: Deploy with Docker
