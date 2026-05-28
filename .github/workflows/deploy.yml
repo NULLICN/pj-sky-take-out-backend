@@ -40,6 +40,7 @@ jobs:
 
           mkdir -p dist
           docker save -o dist/sky-take-out-backend.tar sky-take-out-backend:latest
+          sudo chmod 644 dist/sky-take-out-backend.tar
           echo "Image size: $(du -sh dist/sky-take-out-backend.tar)"
 
       # 5. 上传镜像文件到服务器
