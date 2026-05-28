@@ -31,7 +31,7 @@ jobs:
         run: |
           docker build -t sky-take-out-backend:latest \
             -f - . << 'DOCKERFILE'
-          FROM openjdk:21-slim
+          FROM eclipse-temurin:21-jre
           WORKDIR /app
           COPY sky-take-server/target/*.jar app.jar
           EXPOSE 8080
