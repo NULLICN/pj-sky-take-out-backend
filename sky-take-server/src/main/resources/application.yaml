@@ -50,6 +50,15 @@ logging:
           service: info
           admin: info
 
+springdoc:
+  info:
+    title: 苍穹外卖项目接口文档
+    version: "2.0"
+    description: 苍穹外卖项目接口文档
+  group-configs:
+    - group: admin
+      packages-to-scan: xyz.nullicn.skytakeserver.controller.admin
+
 sky:
   jwt:
     # 设置jwt签名加密时使用的秘钥

@@ -1,4 +1,4 @@
-package xyz.nullicn.skytakeserver.admin;
+package xyz.nullicn.skytakeserver.controller.admin;
 
 import xyz.nullicn.constant.JwtClaimsConstant;
 import xyz.nullicn.dto.EmployeeLoginDTO;
@@ -34,8 +34,8 @@ public class EmployeeController {
     /**
      * 登录
      *
-     * @param employeeLoginDTO
-     * @return
+     * @param employeeLoginDTO 员工登陆视图
+     * @return Result(员工登陆凭证视图)
      */
     @PostMapping("/login")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
@@ -64,7 +64,7 @@ public class EmployeeController {
     /**
      * 退出
      *
-     * @return
+     * @return Result(成功)
      */
     @PostMapping("/logout")
     public Result<String> logout() {
