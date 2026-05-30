@@ -1,17 +1,24 @@
 package xyz.nullicn.skytakeserver.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import org.springframework.beans.BeanUtils;
 import xyz.nullicn.constant.MessageConstant;
 import xyz.nullicn.constant.StatusConstant;
+import xyz.nullicn.context.BaseContext;
+import xyz.nullicn.dto.EmployeeDTO;
 import xyz.nullicn.dto.EmployeeLoginDTO;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.exception.AccountLockedException;
 import xyz.nullicn.exception.AccountNotFoundException;
+import xyz.nullicn.exception.BaseException;
 import xyz.nullicn.exception.PasswordErrorException;
 import xyz.nullicn.skytakeserver.mapper.EmployeeMapper;
 import xyz.nullicn.skytakeserver.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.nullicn.utils.PasswordUtil;
+
+import java.time.LocalDateTime;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -64,6 +71,38 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //3、返回实体对象
         return employee;
+    }
+
+    @Override
+    public boolean addEmployee(EmployeeDTO employeeDTO) {
+        // 检查用户名是否已存在
+        Employee existing = employeeMapper.getByUsername(employeeDTO.getUsername());
+        if (existing != null) {
+            throw new BaseException(MessageConstant.ACCOUNT_ALREADY_EXISTS);
+        }
+
+        // 此处dto到对象的映射，当前少字段可用此方式
+        /*
+        当字段达到20+或更多时考虑更换为MapStruct方式 性能更高
+        20+ 字段的 DTO 映射
+        多处需要相同映射（复用 Mapper 接口）
+        字段名不一致需要 @Mapping 标注
+        * */
+        Employee employee2 = Employee.builder()
+                .username(employeeDTO.getUsername())
+                .name(employeeDTO.getName())
+                .password(PasswordUtil.hashPassword("123456"))
+                .phone(employeeDTO.getPhone())
+                .sex(employeeDTO.getSex())
+                .idNumber(employeeDTO.getIdNumber())
+                .status(StatusConstant.ENABLE)
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
+                .createUser(BaseContext.getCurrentId())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
+
+        return employeeMapper.insert(employee2) > 0;
     }
 
 }

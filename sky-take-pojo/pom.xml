@@ -25,6 +25,12 @@
             <version>2.2.43</version>
         </dependency>
 
+        <!-- Bean Validation API (Jakarta) -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

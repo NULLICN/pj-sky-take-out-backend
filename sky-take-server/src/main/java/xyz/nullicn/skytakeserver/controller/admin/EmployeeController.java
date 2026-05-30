@@ -1,6 +1,12 @@
 package xyz.nullicn.skytakeserver.controller.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import xyz.nullicn.constant.JwtClaimsConstant;
+import xyz.nullicn.dto.EmployeeDTO;
 import xyz.nullicn.dto.EmployeeLoginDTO;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.properties.JwtProperties;
@@ -24,6 +30,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/employee") // /admin/employee
 @Slf4j
+@Tag(name = "员工管理接口", description = "员工登录相关操作")
 public class EmployeeController {
 
     @Autowired
@@ -31,12 +38,11 @@ public class EmployeeController {
     @Autowired
     private JwtProperties jwtProperties;
 
-    /**
-     * 登录
-     *
-     * @param employeeLoginDTO 员工登陆视图
-     * @return Result(员工登陆凭证视图)
-     */
+    @Operation(summary = "员工登录", description = "员工通过用户名和密码进行登录，登录成功后返回JWT令牌")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "登录成功"),
+        @ApiResponse(responseCode = "500", description = "用户名或密码错误，返回错误信息")
+    })
     @PostMapping("/login")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
@@ -61,14 +67,28 @@ public class EmployeeController {
         return Result.success(employeeLoginVO);
     }
 
-    /**
-     * 退出
-     *
-     * @return Result(成功)
-     */
+    @Operation(summary = "员工退出", description = "员工退出登录")
+    @ApiResponse(responseCode = "200", description = "退出成功")
     @PostMapping("/logout")
     public Result<String> logout() {
         return Result.success();
     }
+
+    @Operation(summary = "新增员工", description = "添加一个新员工，默认密码为123456，状态默认为启用")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "添加成功"),
+        @ApiResponse(responseCode = "400", description = "参数校验失败，返回字段错误信息"),
+        @ApiResponse(responseCode = "500", description = "用户名已存在或服务端错误")
+    })
+    @PostMapping
+    public Result<EmployeeDTO> addEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
+        log.info("新增员工：{}", employeeDTO);
+        boolean result = employeeService.addEmployee(employeeDTO);
+        if (result) {
+            return Result.success();
+        }
+        return Result.error("新增员工失败");
+    }
+
 
 }
