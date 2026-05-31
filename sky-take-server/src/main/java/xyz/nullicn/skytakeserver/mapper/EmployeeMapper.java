@@ -1,9 +1,12 @@
 package xyz.nullicn.skytakeserver.mapper;
 
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import xyz.nullicn.dto.EmployeePageQueryDTO;
 import xyz.nullicn.entity.Employee;
+import xyz.nullicn.result.PageResult;
 
 @Mapper
 public interface EmployeeMapper {
@@ -19,4 +22,11 @@ public interface EmployeeMapper {
     @Insert("INSERT INTO employee(username, name, password, phone, sex, id_number, status, create_time, update_time, create_user, update_user) " +
             "VALUES (#{username}, #{name}, #{password}, #{phone}, #{sex}, #{idNumber}, #{status}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})")
     int insert(Employee employee);
+
+    /**
+     * 员工分页查询
+     * @param employeePageQueryDTO 分页查询DTO
+     * @return
+     */
+    Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 }

@@ -5,21 +5,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 import xyz.nullicn.constant.JwtClaimsConstant;
 import xyz.nullicn.dto.EmployeeDTO;
 import xyz.nullicn.dto.EmployeeLoginDTO;
+import xyz.nullicn.dto.EmployeePageQueryDTO;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.properties.JwtProperties;
+import xyz.nullicn.result.PageResult;
 import xyz.nullicn.result.Result;
 import xyz.nullicn.skytakeserver.service.EmployeeService;
 import xyz.nullicn.utils.JwtUtil;
 import xyz.nullicn.vo.EmployeeLoginVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +30,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/employee") // /admin/employee
 @Slf4j
+@Validated
 @Tag(name = "员工管理接口", description = "员工登录相关操作")
 public class EmployeeController {
 
@@ -90,5 +91,15 @@ public class EmployeeController {
         return Result.error("新增员工失败");
     }
 
-
+    @Operation(summary = "员工分页查询", description = "根据传入页号与每页条数返回数据")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "查询成功"),
+            @ApiResponse(responseCode = "400", description = "参数校验失败，返回字段错误信息")
+    })
+    @GetMapping("/page")
+    public Result<PageResult> page(@Valid EmployeePageQueryDTO employeePageQueryDTO) {
+        log.info("分页员工查询: {}", employeePageQueryDTO);
+        PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
+        return Result.success(pageResult);
+    }
 }

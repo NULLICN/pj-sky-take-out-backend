@@ -1,17 +1,19 @@
 package xyz.nullicn.skytakeserver.service.impl;
 
-import cn.hutool.core.util.StrUtil;
-import org.springframework.beans.BeanUtils;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import xyz.nullicn.constant.MessageConstant;
 import xyz.nullicn.constant.StatusConstant;
 import xyz.nullicn.context.BaseContext;
 import xyz.nullicn.dto.EmployeeDTO;
 import xyz.nullicn.dto.EmployeeLoginDTO;
+import xyz.nullicn.dto.EmployeePageQueryDTO;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.exception.AccountLockedException;
 import xyz.nullicn.exception.AccountNotFoundException;
 import xyz.nullicn.exception.BaseException;
 import xyz.nullicn.exception.PasswordErrorException;
+import xyz.nullicn.result.PageResult;
 import xyz.nullicn.skytakeserver.mapper.EmployeeMapper;
 import xyz.nullicn.skytakeserver.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import xyz.nullicn.utils.PasswordUtil;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -102,7 +105,23 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .updateUser(BaseContext.getCurrentId())
                 .build();
 
+        BaseContext.removeCurrentId();
         return employeeMapper.insert(employee2) > 0;
+    }
+
+    @Override
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+        String name = employeePageQueryDTO.getName();
+        int page = employeePageQueryDTO.getPage();
+        int pageSize = employeePageQueryDTO.getPageSize();
+
+        PageHelper.startPage(page, pageSize);
+        Page<Employee> aPage = employeeMapper.pageQuery(employeePageQueryDTO);
+
+        long total = aPage.getTotal();
+        List<Employee> employees = aPage.getResult();
+
+        return new PageResult(total, employees);
     }
 
 }

@@ -2,7 +2,9 @@ package xyz.nullicn.skytakeserver.service;
 
 import xyz.nullicn.dto.EmployeeDTO;
 import xyz.nullicn.dto.EmployeeLoginDTO;
+import xyz.nullicn.dto.EmployeePageQueryDTO;
 import xyz.nullicn.entity.Employee;
+import xyz.nullicn.result.PageResult;
 
 public interface EmployeeService {
 
@@ -19,4 +21,11 @@ public interface EmployeeService {
      * @return 是否创建成功
      */
     boolean addEmployee(EmployeeDTO employeeDTO);
+
+    /**
+     * 员工分页查询
+     * @param employeePageQueryDTO
+     * @return
+     */
+    PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 }
