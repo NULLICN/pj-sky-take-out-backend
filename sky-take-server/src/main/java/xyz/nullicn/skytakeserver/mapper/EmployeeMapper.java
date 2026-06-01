@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import xyz.nullicn.dto.EmployeePageQueryDTO;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.result.PageResult;
@@ -29,4 +30,7 @@ public interface EmployeeMapper {
      * @return
      */
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    @Update("update employee set status = #{status} where id = #{id}")
+    int updateStatus(long id, int status);
 }

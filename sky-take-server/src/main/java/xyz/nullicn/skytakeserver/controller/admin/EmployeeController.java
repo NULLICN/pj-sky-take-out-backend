@@ -102,4 +102,12 @@ public class EmployeeController {
         PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
         return Result.success(pageResult);
     }
+
+    @Operation(summary = "启用禁用员工账号", description = "根据员工ID启用或禁用员工账号，status为0禁用，1启用")
+    @GetMapping("/status/{status}")
+    public Result<String> status(@PathVariable("status") Integer status, @RequestParam Long id) {
+        log.info("启用禁用员工账号：status={}, id={}", status, id);
+        employeeService.updateStatus(id, status);
+        return Result.success();
+    }
 }

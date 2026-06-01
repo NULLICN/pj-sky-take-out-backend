@@ -28,6 +28,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeMapper employeeMapper;
+    private long id;
+    private long status;
 
     /**
      * 员工登录
@@ -122,6 +124,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Employee> employees = aPage.getResult();
 
         return new PageResult(total, employees);
+    }
+
+    @Override
+    public boolean updateStatus(long id, int status) {
+        if (id <= 0) {
+            throw new BaseException("员工ID必须为正整数");
+        }
+        if (status != 0 && status != 1) {
+            throw new BaseException("状态值必须为0或1");
+        }
+        employeeMapper.updateStatus(id, status);
+        return true;
     }
 
 }
