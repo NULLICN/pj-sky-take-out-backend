@@ -24,7 +24,7 @@ public class EmployeePageQueryDTO implements Serializable {
     private int page;
 
     @Min(value = 1, message = "每页记录数最小为1")
-    @Max(value = 100, message = "每页记录数最大为100")
+    @Max(value = 40, message = "每页记录数最大为40")
     @Schema(description = "每页显示记录数", example = "10")
     private int pageSize;
 

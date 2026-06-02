@@ -127,15 +127,21 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public boolean updateStatus(long id, int status) {
+    public void updateStatus(int status, long id) {
         if (id <= 0) {
             throw new BaseException("员工ID必须为正整数");
         }
         if (status != 0 && status != 1) {
             throw new BaseException("状态值必须为0或1");
         }
-        employeeMapper.updateStatus(id, status);
-        return true;
+
+        Employee employee = Employee.builder()
+                                    .status(status)
+                                    .id(id)
+                                    .build();
+
+        employeeMapper.update(employee);
+
     }
 
 }

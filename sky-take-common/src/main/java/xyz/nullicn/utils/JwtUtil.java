@@ -19,17 +19,19 @@ public class JwtUtil {
      * @return
      */
     public static String createJWT(String secretKey, long ttlMillis, Map<String, Object> claims) {
-        // 生成JWT的时间
-        long expMillis = System.currentTimeMillis() + ttlMillis;
-        Date exp = new Date(expMillis);
-
         SecretKey key = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
 
-        return Jwts.builder()
+        var builder = Jwts.builder()
                 .claims(claims)
-                .signWith(key)
-                .expiration(exp)
-                .compact();
+                .signWith(key);
+
+        // ttlMillis <= 0 时视为永久有效，不设置过期时间
+        if (ttlMillis > 0) {
+            long expMillis = System.currentTimeMillis() + ttlMillis;
+            builder.expiration(new Date(expMillis));
+        }
+
+        return builder.compact();
     }
 
     /**

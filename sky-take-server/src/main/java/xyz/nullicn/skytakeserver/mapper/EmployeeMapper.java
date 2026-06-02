@@ -33,4 +33,6 @@ public interface EmployeeMapper {
 
     @Update("update employee set status = #{status} where id = #{id}")
     int updateStatus(long id, int status);
+
+    void update(Employee employee);
 }

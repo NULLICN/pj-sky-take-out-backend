@@ -29,5 +29,5 @@ public interface EmployeeService {
      */
     PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 
-    boolean updateStatus(long id, int status);
+    void updateStatus(int status, long id);
 }

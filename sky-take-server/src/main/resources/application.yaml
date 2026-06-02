@@ -64,6 +64,6 @@ sky:
     # 设置jwt签名加密时使用的秘钥
     admin-secret-key: n0v4c4n3-d3l4y-3xc3l5i0r-bl4d3run5-f4st3r-th4n-light
     # 设置jwt过期时间
-    admin-ttl: 7200000
+    admin-ttl: 0  # 0表示永久有效
     # 设置前端传递过来的令牌名称
     admin-token-name: token

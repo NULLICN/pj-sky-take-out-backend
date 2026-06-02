@@ -5,6 +5,7 @@ import xyz.nullicn.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,6 +47,15 @@ public class GlobalExceptionHandler {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining("; "));
         log.error("参数校验失败：{}", message);
+        return Result.error(message);
+    }
+
+    @ExceptionHandler(BindException.class)
+    public Result<String> handleBindException(BindException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("; "));
+        log.error("参数绑定失败：{}", message);
         return Result.error(message);
     }
 

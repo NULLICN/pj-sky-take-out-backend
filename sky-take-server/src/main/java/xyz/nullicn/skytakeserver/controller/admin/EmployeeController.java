@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.*;
 import xyz.nullicn.constant.JwtClaimsConstant;
 import xyz.nullicn.dto.EmployeeDTO;
@@ -104,10 +105,11 @@ public class EmployeeController {
     }
 
     @Operation(summary = "启用禁用员工账号", description = "根据员工ID启用或禁用员工账号，status为0禁用，1启用")
-    @GetMapping("/status/{status}")
-    public Result<String> status(@PathVariable("status") Integer status, @RequestParam Long id) {
+    @PostMapping("/status/{status}")
+    public Result<String> status(@PathVariable @NotNull(message = "状态值不能为空") Integer status,
+                                  @RequestParam @NotNull(message = "员工ID不能为空") Long id) {
         log.info("启用禁用员工账号：status={}, id={}", status, id);
-        employeeService.updateStatus(id, status);
+        employeeService.updateStatus(status, id);
         return Result.success();
     }
 }
