@@ -1,8 +1,6 @@
 package xyz.nullicn.skytakeserver.controller.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -41,10 +39,6 @@ public class EmployeeController {
     private JwtProperties jwtProperties;
 
     @Operation(summary = "员工登录", description = "员工通过用户名和密码进行登录，登录成功后返回JWT令牌")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "登录成功"),
-        @ApiResponse(responseCode = "500", description = "用户名或密码错误，返回错误信息")
-    })
     @PostMapping("/login")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
@@ -70,18 +64,12 @@ public class EmployeeController {
     }
 
     @Operation(summary = "员工退出", description = "员工退出登录")
-    @ApiResponse(responseCode = "200", description = "退出成功")
     @PostMapping("/logout")
     public Result<String> logout() {
         return Result.success();
     }
 
     @Operation(summary = "新增员工", description = "添加一个新员工，默认密码为123456，状态默认为启用")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "添加成功"),
-        @ApiResponse(responseCode = "400", description = "参数校验失败，返回字段错误信息"),
-        @ApiResponse(responseCode = "500", description = "用户名已存在或服务端错误")
-    })
     @PostMapping
     public Result<EmployeeDTO> addEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
         log.info("新增员工：{}", employeeDTO);
@@ -93,10 +81,6 @@ public class EmployeeController {
     }
 
     @Operation(summary = "员工分页查询", description = "根据传入页号与每页条数返回数据")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "400", description = "参数校验失败，返回字段错误信息")
-    })
     @GetMapping("/page")
     public Result<PageResult> page(@Valid EmployeePageQueryDTO employeePageQueryDTO) {
         log.info("分页员工查询: {}", employeePageQueryDTO);
@@ -110,6 +94,19 @@ public class EmployeeController {
                                   @RequestParam @NotNull(message = "员工ID不能为空") Long id) {
         log.info("启用禁用员工账号：status={}, id={}", status, id);
         employeeService.updateStatus(status, id);
+        return Result.success();
+    }
+
+    @Operation(summary = "根据id查询员工", description = "返回员工所有信息")
+    @GetMapping("/{id}")
+    public Result<Employee> searchById(@PathVariable @NotNull(message = "员工ID不能为空") Long id) {
+        return Result.success(employeeService.getEmployee(id));
+    }
+
+    @Operation(summary = "更新员工数据", description = "根据员工id更新员工数据")
+    @PutMapping
+    public Result<String> editEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
+        employeeService.editEmployee(employeeDTO);
         return Result.success();
     }
 }

@@ -2,6 +2,7 @@ package xyz.nullicn.skytakeserver.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import org.springframework.beans.BeanUtils;
 import xyz.nullicn.constant.MessageConstant;
 import xyz.nullicn.constant.StatusConstant;
 import xyz.nullicn.context.BaseContext;
@@ -142,6 +143,35 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employeeMapper.update(employee);
 
+    }
+
+    @Override
+    public Employee getEmployee(long id) {
+        if (id <= 0) {
+            throw new BaseException("员工ID必须为正整数");
+        }
+
+        Employee employee = employeeMapper.findById(id);
+        employee.setPassword("2778");
+        return employee;
+    }
+
+    @Override
+    public void editEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = Employee.builder()
+                .id(employeeDTO.getId())
+                .username(employeeDTO.getUsername())
+                .name(employeeDTO.getName())
+                .phone(employeeDTO.getPhone())
+                .sex(employeeDTO.getSex())
+                .idNumber(employeeDTO.getIdNumber())
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
+
+        // BeanUtils.copyProperties(employeeDTO, employee); // 缺点 反射方式，运行时可能才发现错误
+
+        employeeMapper.update(employee);
     }
 
 }
