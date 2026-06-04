@@ -3,8 +3,10 @@ package xyz.nullicn.skytakeserver.service;
 import xyz.nullicn.dto.EmployeeDTO;
 import xyz.nullicn.dto.EmployeeLoginDTO;
 import xyz.nullicn.dto.EmployeePageQueryDTO;
+import xyz.nullicn.dto.PasswordEditDTO;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.result.PageResult;
+import xyz.nullicn.result.Result;
 
 public interface EmployeeService {
 
@@ -48,4 +50,11 @@ public interface EmployeeService {
      * @param employeeDTO 员工新数据
      */
     void editEmployee(EmployeeDTO employeeDTO);
+
+    /**
+     * 修改密码
+     * @param passwordEditDTO
+     * @return
+     */
+    void editPassword(PasswordEditDTO passwordEditDTO);
 }

@@ -2,13 +2,16 @@ package xyz.nullicn.skytakeserver.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.BeanUtils;
 import xyz.nullicn.constant.MessageConstant;
+import xyz.nullicn.constant.PasswordConstant;
 import xyz.nullicn.constant.StatusConstant;
 import xyz.nullicn.context.BaseContext;
 import xyz.nullicn.dto.EmployeeDTO;
 import xyz.nullicn.dto.EmployeeLoginDTO;
 import xyz.nullicn.dto.EmployeePageQueryDTO;
+import xyz.nullicn.dto.PasswordEditDTO;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.exception.AccountLockedException;
 import xyz.nullicn.exception.AccountNotFoundException;
@@ -97,7 +100,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee2 = Employee.builder()
                 .username(employeeDTO.getUsername())
                 .name(employeeDTO.getName())
-                .password(PasswordUtil.hashPassword("123456"))
+                .password(PasswordUtil.hashPassword(PasswordConstant.DEFAULT_PASSWORD))
                 .phone(employeeDTO.getPhone())
                 .sex(employeeDTO.getSex())
                 .idNumber(employeeDTO.getIdNumber())
@@ -172,6 +175,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         // BeanUtils.copyProperties(employeeDTO, employee); // 缺点 反射方式，运行时可能才发现错误
 
         employeeMapper.update(employee);
+    }
+
+    @Override
+    public void editPassword(PasswordEditDTO passwordEditDTO) {
+     String oldPassword = passwordEditDTO.getOldPassword();
+     String newPassword = passwordEditDTO.getNewPassword();
+
+        // 通过id先拿到员工旧密码然后对比加密新密码
+        Employee employee = employeeMapper.findById(BaseContext.getCurrentId());
+
+        boolean compareResult = PasswordUtil.checkPassword(oldPassword, employee.getPassword());
+
+        if(!compareResult) {
+            throw new PasswordErrorException("旧密码错误");
+        }
+
+        String newEncodePassword = PasswordUtil.hashPassword(newPassword);
+        Employee newEmployeePasData = Employee.builder()
+                .id(employee.getId())
+                .password(newEncodePassword)
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
+
+
+        employeeMapper.update(newEmployeePasData);
     }
 
 }

@@ -9,6 +9,7 @@ import xyz.nullicn.constant.JwtClaimsConstant;
 import xyz.nullicn.dto.EmployeeDTO;
 import xyz.nullicn.dto.EmployeeLoginDTO;
 import xyz.nullicn.dto.EmployeePageQueryDTO;
+import xyz.nullicn.dto.PasswordEditDTO;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.properties.JwtProperties;
 import xyz.nullicn.result.PageResult;
@@ -109,4 +110,12 @@ public class EmployeeController {
         employeeService.editEmployee(employeeDTO);
         return Result.success();
     }
+
+    @Operation(summary = "修改密码", description = "")
+    @PutMapping("/editPassword")
+    public Result<String> editPassword(@Valid @RequestBody PasswordEditDTO passwordEditDTO) {
+        employeeService.editPassword(passwordEditDTO);
+        return Result.success();
+    }
 }
+

@@ -1,6 +1,7 @@
 package xyz.nullicn.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,6 +14,7 @@ public class EmployeeLoginDTO implements Serializable {
     private String username;
 
     @Schema(description = "密码")
+    @Pattern(regexp = "^[a-zA-Z0-9]{6,20}$", message = "密码需为6-20位字母与数字")
     private String password;
 
 }
