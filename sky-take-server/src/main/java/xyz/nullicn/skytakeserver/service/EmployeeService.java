@@ -20,9 +20,8 @@ public interface EmployeeService {
     /**
      * 新增员工
      * @param employeeDTO 新员工数据模型
-     * @return 是否创建成功
      */
-    boolean addEmployee(EmployeeDTO employeeDTO);
+    void addEmployee(EmployeeDTO employeeDTO);
 
     /**
      * 员工分页查询

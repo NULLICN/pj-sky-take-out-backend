@@ -74,11 +74,8 @@ public class EmployeeController {
     @PostMapping
     public Result<EmployeeDTO> addEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
         log.info("新增员工：{}", employeeDTO);
-        boolean result = employeeService.addEmployee(employeeDTO);
-        if (result) {
-            return Result.success();
-        }
-        return Result.error("新增员工失败");
+        employeeService.addEmployee(employeeDTO);
+        return Result.success();
     }
 
     @Operation(summary = "员工分页查询", description = "根据传入页号与每页条数返回数据")

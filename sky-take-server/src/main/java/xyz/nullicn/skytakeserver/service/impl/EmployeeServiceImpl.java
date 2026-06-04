@@ -83,7 +83,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public boolean addEmployee(EmployeeDTO employeeDTO) {
+    public void addEmployee(EmployeeDTO employeeDTO) {
         // 检查用户名是否已存在
         Employee existing = employeeMapper.getByUsername(employeeDTO.getUsername());
         if (existing != null) {
@@ -97,7 +97,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         多处需要相同映射（复用 Mapper 接口）
         字段名不一致需要 @Mapping 标注
         * */
-        Employee employee2 = Employee.builder()
+        Employee employee = Employee.builder()
                 .username(employeeDTO.getUsername())
                 .name(employeeDTO.getName())
                 .password(PasswordUtil.hashPassword(PasswordConstant.DEFAULT_PASSWORD))
@@ -105,14 +105,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .sex(employeeDTO.getSex())
                 .idNumber(employeeDTO.getIdNumber())
                 .status(StatusConstant.ENABLE)
-                .createTime(LocalDateTime.now())
-                .updateTime(LocalDateTime.now())
-                .createUser(BaseContext.getCurrentId())
-                .updateUser(BaseContext.getCurrentId())
                 .build();
 
-        BaseContext.removeCurrentId();
-        return employeeMapper.insert(employee2) > 0;
+        employeeMapper.insert(employee);
     }
 
     @Override
