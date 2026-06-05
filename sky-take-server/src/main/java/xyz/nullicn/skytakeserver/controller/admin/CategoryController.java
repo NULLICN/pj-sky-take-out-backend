@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/category")
 @Slf4j
-@Tag(name = "分类相关接口", description = "分类相关操作")
+@Tag(name = "分类相关接口", description = "新增、分页查询、删除、修改、启用/禁用、按类型查询")
 public class CategoryController {
 
     @Autowired

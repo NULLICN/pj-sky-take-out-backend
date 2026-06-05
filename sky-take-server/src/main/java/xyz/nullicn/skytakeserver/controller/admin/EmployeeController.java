@@ -31,7 +31,7 @@ import java.util.Map;
 @RequestMapping("/admin/employee") // /admin/employee
 @Slf4j
 @Validated
-@Tag(name = "员工管理接口", description = "员工登录相关操作")
+@Tag(name = "员工管理接口", description = "登录、退出、新增、分页查询、启用/禁用、按ID查询、编辑、修改密码")
 public class EmployeeController {
 
     @Autowired
