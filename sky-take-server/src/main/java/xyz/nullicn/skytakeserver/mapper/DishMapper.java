@@ -1,10 +1,15 @@
 package xyz.nullicn.skytakeserver.mapper;
 
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import xyz.nullicn.dto.DishPageQueryDTO;
+import xyz.nullicn.dto.EmployeePageQueryDTO;
 import xyz.nullicn.entity.Dish;
+import xyz.nullicn.entity.Employee;
 import xyz.nullicn.enumeration.OperationType;
 import xyz.nullicn.skytakeserver.annotation.AutoFill;
+import xyz.nullicn.vo.DishVO;
 
 @Mapper
 public interface DishMapper {
@@ -23,4 +28,11 @@ public interface DishMapper {
      */
     @AutoFill(OperationType.INSERT)
     void insert(Dish dish);
+
+    /**
+     * 分页查询
+     * @param dishPageQueryDTO
+     * @return
+     */
+    Page<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
 }

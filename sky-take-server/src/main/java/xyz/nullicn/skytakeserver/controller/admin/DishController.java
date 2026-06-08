@@ -5,11 +5,11 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import xyz.nullicn.dto.DishDTO;
+import xyz.nullicn.dto.DishPageQueryDTO;
+import xyz.nullicn.entity.Dish;
+import xyz.nullicn.result.PageResult;
 import xyz.nullicn.result.Result;
 import xyz.nullicn.skytakeserver.service.DishService;
 
@@ -23,8 +23,15 @@ public class DishController {
     private DishService dishService;
 
     @PostMapping
-    Result<String> addDish(@RequestBody @Valid DishDTO dish) {
+    public Result<String> addDish(@RequestBody @Valid DishDTO dish) {
         dishService.addWithFlavor(dish);
         return Result.success();
+    }
+
+    @GetMapping("/page")
+    public Result<PageResult> page(@Valid DishPageQueryDTO dishPageQueryDTO) {
+        log.info("分页菜品查询: {}", dishPageQueryDTO);
+        PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
+        return Result.success(pageResult);
     }
 }

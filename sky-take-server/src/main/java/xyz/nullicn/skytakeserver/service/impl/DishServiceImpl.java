@@ -1,15 +1,21 @@
 package xyz.nullicn.skytakeserver.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.nullicn.dto.DishDTO;
+import xyz.nullicn.dto.DishPageQueryDTO;
 import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.DishFlavor;
+import xyz.nullicn.entity.Employee;
+import xyz.nullicn.result.PageResult;
 import xyz.nullicn.skytakeserver.mapper.DishFlavorMapper;
 import xyz.nullicn.skytakeserver.mapper.DishMapper;
 import xyz.nullicn.skytakeserver.service.DishService;
+import xyz.nullicn.vo.DishVO;
 
 import java.util.List;
 
@@ -40,5 +46,21 @@ public class DishServiceImpl implements DishService {
             flavors.forEach(f -> f.setDishId(dish.getId()));
             dishFlavorMapper.insertBatch(flavors);
         }
+    }
+
+    @Override
+    public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
+
+        int page = dishPageQueryDTO.getPage();
+        int pageSize = dishPageQueryDTO.getPageSize();
+
+        PageHelper.startPage(page, pageSize);
+        Page<DishVO> aPage = dishMapper.pageQuery(dishPageQueryDTO);
+
+        long total = aPage.getTotal();
+        List<DishVO> dishes = aPage.getResult();
+
+        return new PageResult(total, dishes);
+
     }
 }
