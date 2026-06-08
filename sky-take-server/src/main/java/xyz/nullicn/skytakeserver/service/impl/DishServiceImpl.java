@@ -6,14 +6,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import xyz.nullicn.constant.MessageConstant;
+import xyz.nullicn.constant.StatusConstant;
 import xyz.nullicn.dto.DishDTO;
 import xyz.nullicn.dto.DishPageQueryDTO;
 import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.DishFlavor;
 import xyz.nullicn.entity.Employee;
+import xyz.nullicn.exception.DeletionNotAllowedException;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.skytakeserver.mapper.DishFlavorMapper;
 import xyz.nullicn.skytakeserver.mapper.DishMapper;
+import xyz.nullicn.skytakeserver.mapper.SetmealMapper;
 import xyz.nullicn.skytakeserver.service.DishService;
 import xyz.nullicn.vo.DishVO;
 
@@ -27,6 +31,8 @@ public class DishServiceImpl implements DishService {
     private DishMapper dishMapper;
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+    @Autowired
+    private SetmealMapper setmealMapper;
 
     @Override
     @Transactional
@@ -62,5 +68,21 @@ public class DishServiceImpl implements DishService {
 
         return new PageResult(total, dishes);
 
+    }
+
+    @Override
+    public void deleteBatch(List<Long> ids) {
+        for (Long id : ids) {
+            Dish dish = dishMapper.getById(id);
+            if(dish.getStatus() == StatusConstant.ENABLE) {
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+
+
+        List<Long> setmealids = setmealMapper.getSetmealIdsByDishId(ids);
+        if(setmealids != null || setmealids.size() > 0) {
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
     }
 }

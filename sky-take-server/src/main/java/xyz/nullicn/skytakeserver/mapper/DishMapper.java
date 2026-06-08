@@ -1,6 +1,7 @@
 package xyz.nullicn.skytakeserver.mapper;
 
 import com.github.pagehelper.Page;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import xyz.nullicn.dto.DishPageQueryDTO;
@@ -35,4 +36,10 @@ public interface DishMapper {
      * @return
      */
     Page<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
+
+    @Delete("")
+    void deleteById(Long id);
+
+    @Select("SELECT * from dish where id = #{id}")
+    Dish getById(Long id);
 }

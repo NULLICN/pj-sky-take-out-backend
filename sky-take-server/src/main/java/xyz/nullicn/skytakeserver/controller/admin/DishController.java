@@ -8,10 +8,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.nullicn.dto.DishDTO;
 import xyz.nullicn.dto.DishPageQueryDTO;
-import xyz.nullicn.entity.Dish;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.result.Result;
 import xyz.nullicn.skytakeserver.service.DishService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -33,5 +34,11 @@ public class DishController {
         log.info("分页菜品查询: {}", dishPageQueryDTO);
         PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    @DeleteMapping("/{ids}")
+    public Result<String> deleteByIds(@RequestParam @Valid List<Long> ids) {
+        dishService.deleteBatch(ids);
+        return Result.success();
     }
 }
