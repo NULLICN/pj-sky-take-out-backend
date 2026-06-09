@@ -71,7 +71,9 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
+    @Transactional
     public void deleteBatch(List<Long> ids) {
+        // 检查菜品是否启用
         for (Long id : ids) {
             Dish dish = dishMapper.getById(id);
             if(dish.getStatus() == StatusConstant.ENABLE) {
@@ -79,10 +81,16 @@ public class DishServiceImpl implements DishService {
             }
         }
 
-
+        // 检查菜品是否被关联至套餐
         List<Long> setmealids = setmealMapper.getSetmealIdsByDishId(ids);
-        if(setmealids != null || setmealids.size() > 0) {
+        if(setmealids != null && setmealids.size() > 0) {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+
+
+        for(Long id : ids) {
+            dishMapper.deleteById(id);
+            dishFlavorMapper.deleteByDishId(id);
         }
     }
 }

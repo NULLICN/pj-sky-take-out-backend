@@ -36,7 +36,7 @@ public class DishController {
         return Result.success(pageResult);
     }
 
-    @DeleteMapping("/{ids}")
+    @DeleteMapping
     public Result<String> deleteByIds(@RequestParam @Valid List<Long> ids) {
         dishService.deleteBatch(ids);
         return Result.success();

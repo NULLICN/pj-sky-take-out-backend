@@ -1,5 +1,6 @@
 package xyz.nullicn.skytakeserver.mapper;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import xyz.nullicn.entity.DishFlavor;
 
@@ -13,4 +14,7 @@ public interface DishFlavorMapper {
      * @param flavors
      */
     void insertBatch(List<DishFlavor> flavors);
+
+    @Delete("delete from dish_flavor where dish_id = #{dishId}")
+    void deleteByDishId(Long dishId);
 }

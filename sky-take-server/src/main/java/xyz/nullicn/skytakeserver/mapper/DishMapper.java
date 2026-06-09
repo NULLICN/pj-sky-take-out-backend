@@ -37,7 +37,7 @@ public interface DishMapper {
      */
     Page<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
 
-    @Delete("")
+    @Delete("delete from dish where id = #{id}")
     void deleteById(Long id);
 
     @Select("SELECT * from dish where id = #{id}")
