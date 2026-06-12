@@ -56,7 +56,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         /* 替代这里，使用hutool的加盐方式加密密码
         //密码比对
-        // TODO 后期需要进行md5加密，然后再进行比对
+        //
         if (!password.equals(employee.getPassword())) {
             //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
@@ -167,7 +167,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .updateUser(BaseContext.getCurrentId())
                 .build();
 
-        // BeanUtils.copyProperties(employeeDTO, employee); // 缺点 反射方式，运行时可能才发现错误
+        // BeanUtils.copyProperties(employeeDTO, employee); // 这行方法的缺点 反射方式，运行时可能才发现错误
 
         employeeMapper.update(employee);
     }

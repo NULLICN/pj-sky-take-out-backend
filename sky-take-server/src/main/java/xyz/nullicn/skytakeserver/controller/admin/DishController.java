@@ -41,4 +41,10 @@ public class DishController {
         dishService.deleteBatch(ids);
         return Result.success();
     }
+
+    @PutMapping
+    public Result<String> editDish(@RequestBody @Valid DishDTO dishDTO) {
+        dishService.editDish(dishDTO);
+        return Result.success();
+    }
 }

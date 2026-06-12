@@ -48,10 +48,10 @@ public class CategoryServiceImpl implements CategoryService {
         category.setStatus(StatusConstant.DISABLE);
 
         //设置创建时间、修改时间、创建人、修改人
-        category.setCreateTime(LocalDateTime.now());
+        /*category.setCreateTime(LocalDateTime.now());
         category.setUpdateTime(LocalDateTime.now());
         category.setCreateUser(BaseContext.getCurrentId());
-        category.setUpdateUser(BaseContext.getCurrentId());
+        category.setUpdateUser(BaseContext.getCurrentId());*/ // 注解AutoFill会自动填充这些字段
 
         categoryMapper.insert(category);
     }
@@ -62,10 +62,13 @@ public class CategoryServiceImpl implements CategoryService {
      * @return
      */
     public PageResult pageQuery(CategoryPageQueryDTO categoryPageQueryDTO) {
-        PageHelper.startPage(categoryPageQueryDTO.getPage(),categoryPageQueryDTO.getPageSize());
+        int page = categoryPageQueryDTO.getPage();
+        int pageSize = categoryPageQueryDTO.getPageSize();
+
+        PageHelper.startPage(page, pageSize);
         //下一条sql进行分页，自动加入limit关键字分页
-        Page<Category> page = categoryMapper.pageQuery(categoryPageQueryDTO);
-        return new PageResult(page.getTotal(), page.getResult());
+        Page<Category> pages = categoryMapper.pageQuery(categoryPageQueryDTO);
+        return new PageResult(pages.getTotal(), pages.getResult());
     }
 
     /**

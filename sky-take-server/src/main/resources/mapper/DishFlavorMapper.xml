@@ -10,4 +10,14 @@
         </foreach>
     </insert>
 
+    <update id="update" parameterType="DishFlavor">
+        update dish_flavor
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="dishId != null">dish_id = #{dishId},</if>
+            <if test="value != null">value = #{value},</if>
+        </set>
+        where id = #{id}
+    </update>
+
 </mapper>

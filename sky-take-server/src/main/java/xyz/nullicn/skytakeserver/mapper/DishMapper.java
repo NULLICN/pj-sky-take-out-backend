@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import xyz.nullicn.dto.DishDTO;
 import xyz.nullicn.dto.DishPageQueryDTO;
 import xyz.nullicn.dto.EmployeePageQueryDTO;
 import xyz.nullicn.entity.Dish;
@@ -42,4 +43,7 @@ public interface DishMapper {
 
     @Select("SELECT * from dish where id = #{id}")
     Dish getById(Long id);
+
+    @AutoFill(OperationType.UPDATE)
+    void update(Dish dish);
 }
