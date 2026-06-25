@@ -12,7 +12,6 @@ import xyz.nullicn.dto.DishDTO;
 import xyz.nullicn.dto.DishPageQueryDTO;
 import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.DishFlavor;
-import xyz.nullicn.entity.Employee;
 import xyz.nullicn.exception.DeletionNotAllowedException;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.skytakeserver.mapper.DishFlavorMapper;
@@ -96,7 +95,7 @@ public class DishServiceImpl implements DishService {
 
     @Override
     @Transactional
-    public void editDish(DishDTO dishDTO) {
+    public void updateWithFlavor(DishDTO dishDTO) {
         Dish dish = Dish.builder()
                 .id(dishDTO.getId())
                 .name(dishDTO.getName())
@@ -114,5 +113,23 @@ public class DishServiceImpl implements DishService {
             flavors.forEach(f -> f.setDishId(dishDTO.getId()));
             dishFlavorMapper.insertBatch(flavors);
         }
+    }
+
+    @Override
+    public DishVO getDByIdWithFlavor(Long id) {
+        Dish dish = dishMapper.getById(id);
+        List<DishFlavor> flavors = dishFlavorMapper.getBydishId(dish.getId());
+        DishVO dishVO = DishVO.builder()
+                .id(dish.getId())
+                .name(dish.getName())
+                .categoryId(dish.getCategoryId())
+                .price(dish.getPrice())
+                .image(dish.getImage())
+                .description(dish.getDescription())
+                .status(dish.getStatus())
+                .updateTime(dish.getUpdateTime())
+                .flavors(flavors)
+                .build();
+        return dishVO;
     }
 }

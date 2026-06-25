@@ -2,6 +2,7 @@ package xyz.nullicn.skytakeserver.mapper;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import xyz.nullicn.entity.DishFlavor;
 
 import java.util.List;
@@ -19,4 +20,7 @@ public interface DishFlavorMapper {
     void deleteByDishId(Long dishId);
 
     void update(DishFlavor flavor);
+
+    @Select ("select * from dish_flavor where dish_id = #{dishId}")
+    List<DishFlavor> getBydishId(Long dishId);
 }

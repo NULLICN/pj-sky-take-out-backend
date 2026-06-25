@@ -11,6 +11,7 @@ import xyz.nullicn.dto.DishPageQueryDTO;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.result.Result;
 import xyz.nullicn.skytakeserver.service.DishService;
+import xyz.nullicn.vo.DishVO;
 
 import java.util.List;
 
@@ -43,8 +44,14 @@ public class DishController {
     }
 
     @PutMapping
-    public Result<String> editDish(@RequestBody @Valid DishDTO dishDTO) {
-        dishService.editDish(dishDTO);
+    public Result<String> update(@RequestBody @Valid DishDTO dishDTO) {
+        dishService.updateWithFlavor(dishDTO);
         return Result.success();
+    }
+
+    @GetMapping("/{id}")
+    public Result<DishVO> getDishById(@PathVariable Long id) {
+        DishVO dishVO = dishService.getDByIdWithFlavor(id);
+        return Result.success(dishVO);
     }
 }
