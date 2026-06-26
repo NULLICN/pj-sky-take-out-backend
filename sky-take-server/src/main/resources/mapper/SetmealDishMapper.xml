@@ -2,6 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="xyz.nullicn.skytakeserver.mapper.SetmealMapper">
+    <insert id="insert" parameterType="xyz.nullicn.entity.Setmeal"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into setmeal (name, category_id, price, image, description,
+                          status, create_time, update_time, create_user, update_user)
+        values (#{name}, #{categoryId}, #{price}, #{image}, #{description},
+                #{status}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into setmeal_dish (setmeal_id, dish_id, name, price, copies) values
+        <foreach collection="setmealDishes" item="item" separator=",">
+            (#{item.setmealId}, #{item.dishId}, #{item.name}, #{item.price}, #{item.copies})
+        </foreach>
+    </insert>
 
     <select id="getSetmealIdsByDishId" resultType="java.lang.Long">
         SELECT setmeal_id from setmeal_dish where dish_id in

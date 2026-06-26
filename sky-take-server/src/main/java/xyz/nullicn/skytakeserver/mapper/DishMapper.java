@@ -13,6 +13,8 @@ import xyz.nullicn.enumeration.OperationType;
 import xyz.nullicn.skytakeserver.annotation.AutoFill;
 import xyz.nullicn.vo.DishVO;
 
+import java.util.List;
+
 @Mapper
 public interface DishMapper {
 
@@ -23,6 +25,8 @@ public interface DishMapper {
      */
     @Select("select count(id) from dish where category_id = #{categoryId}")
     Integer countByCategoryId(Long categoryId);
+
+    List<Dish> getByCategoryId(Long categoryId);
 
     /**
      * 新增菜品

@@ -1,5 +1,6 @@
 package xyz.nullicn.skytakeserver.controller.admin;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.nullicn.dto.DishDTO;
 import xyz.nullicn.dto.DishPageQueryDTO;
+import xyz.nullicn.entity.Dish;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.result.Result;
 import xyz.nullicn.skytakeserver.service.DishService;
@@ -53,5 +55,12 @@ public class DishController {
     public Result<DishVO> getDishById(@PathVariable Long id) {
         DishVO dishVO = dishService.getDByIdWithFlavor(id);
         return Result.success(dishVO);
+    }
+
+    @GetMapping("/list")
+    public Result<List<Dish>> getDishList(@Parameter Long categoryId) {
+        log.info("查询菜品种类id: {}", categoryId);
+        List<Dish> dishList = dishService.getDishesByCategoryId(categoryId);
+        return Result.success(dishList);
     }
 }

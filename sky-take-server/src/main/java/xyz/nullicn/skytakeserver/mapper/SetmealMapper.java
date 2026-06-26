@@ -2,6 +2,10 @@ package xyz.nullicn.skytakeserver.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import xyz.nullicn.entity.Setmeal;
+import xyz.nullicn.entity.SetmealDish;
+import xyz.nullicn.enumeration.OperationType;
+import xyz.nullicn.skytakeserver.annotation.AutoFill;
 
 import java.util.List;
 
@@ -18,4 +22,8 @@ public interface SetmealMapper {
 
     List<Long> getSetmealIdsByDishId(List<Long> dishIds);
 
+    @AutoFill(OperationType.INSERT)
+    void insert(Setmeal setmeal);
+
+    void insertBatch(List<SetmealDish> setmealDishes);
 }

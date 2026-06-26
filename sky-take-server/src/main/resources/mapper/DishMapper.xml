@@ -28,6 +28,10 @@
         order by d.create_time desc
     </select>
 
+    <select id="getByCategoryId" resultType="xyz.nullicn.entity.Dish">
+        select * from dish where category_id = #{categoryId}
+    </select>
+
     <update id="update" parameterType="xyz.nullicn.entity.Dish">
         update dish
         <set>

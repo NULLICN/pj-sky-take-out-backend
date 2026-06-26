@@ -2,6 +2,7 @@ package xyz.nullicn.skytakeserver.service;
 
 import xyz.nullicn.dto.DishDTO;
 import xyz.nullicn.dto.DishPageQueryDTO;
+import xyz.nullicn.entity.Dish;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.vo.DishVO;
 
@@ -17,4 +18,6 @@ public interface DishService {
     void updateWithFlavor(DishDTO dishDTO);
 
     DishVO getDByIdWithFlavor(Long id);
+
+    List<Dish> getDishesByCategoryId(Long categoryId);
 }
