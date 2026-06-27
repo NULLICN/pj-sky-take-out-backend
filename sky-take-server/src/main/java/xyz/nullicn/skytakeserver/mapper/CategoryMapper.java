@@ -1,6 +1,7 @@
 package xyz.nullicn.skytakeserver.mapper;
 
 import com.github.pagehelper.Page;
+import org.apache.ibatis.annotations.Select;
 import xyz.nullicn.enumeration.OperationType;
 import xyz.nullicn.dto.CategoryPageQueryDTO;
 import xyz.nullicn.entity.Category;
@@ -52,4 +53,7 @@ public interface CategoryMapper {
      * @return
      */
     List<Category> list(Integer type);
+
+    @Select("select * from category where id = #{id}")
+    Category getById(Long id);
 }

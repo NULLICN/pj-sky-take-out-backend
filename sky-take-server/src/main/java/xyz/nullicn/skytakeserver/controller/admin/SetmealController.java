@@ -4,13 +4,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import xyz.nullicn.dto.SetmealDTO;
 import xyz.nullicn.result.Result;
 import xyz.nullicn.skytakeserver.service.SetmealService;
+import xyz.nullicn.vo.SetmealVO;
 
 /**
  * 套餐管理
@@ -30,5 +28,12 @@ public class SetmealController {
         log.info("新增套餐: {}", setmealDTO);
         setmealService.addSetmeal(setmealDTO);
         return Result.success();
+    }
+
+    @GetMapping("/{id}")
+    public Result<SetmealVO> getSetmealById(@PathVariable Long id) {
+        log.info("查询套餐id: {}", id);
+        SetmealVO setmealVO = setmealService.getById(id);
+        return Result.success(setmealVO);
     }
 }
