@@ -1,5 +1,6 @@
 package xyz.nullicn.skytakeserver.controller.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class CommonController {
     private final AliOssUtil aliOssUtil;
 
     @PostMapping("/upload")
+    @Operation(summary = "文件上传", description = "上传文件并返回一个文件路径")
     public Result<String> upload(MultipartFile file){
         log.info("文件上传: {}", file);
 

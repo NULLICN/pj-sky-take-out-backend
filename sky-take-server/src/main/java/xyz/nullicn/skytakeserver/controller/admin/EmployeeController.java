@@ -108,7 +108,7 @@ public class EmployeeController {
         return Result.success();
     }
 
-    @Operation(summary = "修改密码", description = "")
+    @Operation(summary = "修改密码", description = "更新密码同时检验旧密码")
     @PutMapping("/editPassword")
     public Result<String> editPassword(@Valid @RequestBody PasswordEditDTO passwordEditDTO) {
         employeeService.editPassword(passwordEditDTO);

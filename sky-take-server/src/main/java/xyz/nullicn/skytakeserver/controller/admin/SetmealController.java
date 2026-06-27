@@ -1,5 +1,6 @@
 package xyz.nullicn.skytakeserver.controller.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ public class SetmealController {
     private SetmealService setmealService;
 
     @PostMapping
+    @Operation(summary = "新增套餐", description = "新增一个套餐和其套餐菜品")
     public Result<String> addSetmeal(@RequestBody SetmealDTO setmealDTO) {
         log.info("新增套餐: {}", setmealDTO);
         setmealService.addSetmeal(setmealDTO);
@@ -31,6 +33,7 @@ public class SetmealController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "通过套餐id查询套餐", description = "查询一个套餐和其套餐菜品")
     public Result<SetmealVO> getSetmealById(@PathVariable Long id) {
         log.info("查询套餐id: {}", id);
         SetmealVO setmealVO = setmealService.getById(id);
