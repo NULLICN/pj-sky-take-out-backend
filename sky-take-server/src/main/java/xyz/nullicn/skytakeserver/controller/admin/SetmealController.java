@@ -7,9 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.nullicn.dto.SetmealDTO;
+import xyz.nullicn.dto.SetmealPageQueryDTO;
+import xyz.nullicn.entity.Setmeal;
+import xyz.nullicn.result.PageResult;
 import xyz.nullicn.result.Result;
 import xyz.nullicn.skytakeserver.service.SetmealService;
 import xyz.nullicn.vo.SetmealVO;
+
+import java.util.List;
 
 /**
  * 套餐管理
@@ -38,5 +43,12 @@ public class SetmealController {
         log.info("查询套餐id: {}", id);
         SetmealVO setmealVO = setmealService.getById(id);
         return Result.success(setmealVO);
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "分页查询套餐", description = "返回页大小的套餐数量")
+    public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO) {
+        PageResult pageResult = setmealService.page(setmealPageQueryDTO);
+        return Result.success(pageResult);
     }
 }

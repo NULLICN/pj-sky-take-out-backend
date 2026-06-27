@@ -1,11 +1,14 @@
 package xyz.nullicn.skytakeserver.mapper;
 
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import xyz.nullicn.dto.SetmealPageQueryDTO;
 import xyz.nullicn.entity.Setmeal;
 import xyz.nullicn.entity.SetmealDish;
 import xyz.nullicn.enumeration.OperationType;
 import xyz.nullicn.skytakeserver.annotation.AutoFill;
+import xyz.nullicn.vo.SetmealVO;
 
 import java.util.List;
 
@@ -31,4 +34,6 @@ public interface SetmealMapper {
     Setmeal getById(Long id);
 
     List<SetmealDish> getSetmealDishesBySetmealId(Long setmealId);
+
+    Page<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 }

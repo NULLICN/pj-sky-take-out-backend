@@ -1,17 +1,22 @@
 package xyz.nullicn.skytakeserver.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.nullicn.dto.SetmealDTO;
+import xyz.nullicn.dto.SetmealPageQueryDTO;
 import xyz.nullicn.entity.Category;
 import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.Setmeal;
 import xyz.nullicn.entity.SetmealDish;
+import xyz.nullicn.result.PageResult;
 import xyz.nullicn.skytakeserver.mapper.CategoryMapper;
 import xyz.nullicn.skytakeserver.mapper.DishMapper;
 import xyz.nullicn.skytakeserver.mapper.SetmealMapper;
 import xyz.nullicn.skytakeserver.service.SetmealService;
+import xyz.nullicn.vo.DishVO;
 import xyz.nullicn.vo.SetmealVO;
 
 import java.util.List;
@@ -73,5 +78,19 @@ public class SetmealServiceImpl implements SetmealService {
                 .setmealDishes(setmealDishes)
                 .build();
         return setmealVO;
+    }
+
+    @Override
+    public PageResult page(SetmealPageQueryDTO setmealPageQueryDTO) {
+        int page = setmealPageQueryDTO.getPage();
+        int pageSize = setmealPageQueryDTO.getPageSize();
+
+        PageHelper.startPage(page, pageSize);
+        Page<SetmealVO> aPage = setmealMapper.pageQuery(setmealPageQueryDTO);
+
+        long total = aPage.getTotal();
+        List<SetmealVO> setmealVOList = aPage.getResult();
+
+        return new PageResult(total, setmealVOList);
     }
 }
