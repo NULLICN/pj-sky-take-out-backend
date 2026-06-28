@@ -72,11 +72,25 @@ jobs:
             # 加载镜像
             docker load -i /var/www/sky-take-out/sky-take-out-backend.tar
 
-            # 启动容器
+            # 启动容器（通过 GitHub Secrets 注入敏感配置）
             docker run -d \
               --name sky-take-out-backend \
               -p 8080:8080 \
               --restart unless-stopped \
+              -e SKY_DATASOURCE_HOST=${{ secrets.SKY_DATASOURCE_HOST }} \
+              -e SKY_DATASOURCE_PORT=${{ secrets.SKY_DATASOURCE_PORT }} \
+              -e SKY_DATASOURCE_DATABASE=${{ secrets.SKY_DATASOURCE_DATABASE }} \
+              -e SKY_DATASOURCE_USERNAME=${{ secrets.SKY_DATASOURCE_USERNAME }} \
+              -e SKY_DATASOURCE_PASSWORD=${{ secrets.SKY_DATASOURCE_PASSWORD }} \
+              -e SKY_REDIS_HOST=${{ secrets.SKY_REDIS_HOST }} \
+              -e SKY_REDIS_PORT=${{ secrets.SKY_REDIS_PORT }} \
+              -e SKY_REDIS_PASSWORD=${{ secrets.SKY_REDIS_PASSWORD }} \
+              -e SKY_REDIS_DATABASE=${{ secrets.SKY_REDIS_DATABASE }} \
+              -e SKY_JWT_ADMIN_SECRET_KEY=${{ secrets.SKY_JWT_ADMIN_SECRET_KEY }} \
+              -e SKY_ALIOSS_ACCESS_KEY_ID=${{ secrets.SKY_ALIOSS_ACCESS_KEY_ID }} \
+              -e SKY_ALIOSS_ACCESS_KEY_SECRET=${{ secrets.SKY_ALIOSS_ACCESS_KEY_SECRET }} \
+              -e SKY_ALIOSS_BUCKET_NAME=${{ secrets.SKY_ALIOSS_BUCKET_NAME }} \
+              -e SKY_ALIOSS_ENDPOINT=${{ secrets.SKY_ALIOSS_ENDPOINT }} \
               sky-take-out-backend:latest
 
             # 清理旧镜像（保留当前使用的）

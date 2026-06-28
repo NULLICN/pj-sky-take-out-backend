@@ -70,4 +70,12 @@ public class DishController {
         List<Dish> dishList = dishService.getDishesByCategoryId(categoryId);
         return Result.success(dishList);
     }
+
+    @PostMapping("/status/{status}")
+    @Operation(summary = "停售起售菜品", description = "操作id菜品装填，1为起售，0为停售")
+    public Result<String> status(@PathVariable int status, @Parameter Long id) {
+        log.info("状态: {} id: {}", status, id);
+        dishService.status(status, id);
+        return Result.success();
+    }
 }

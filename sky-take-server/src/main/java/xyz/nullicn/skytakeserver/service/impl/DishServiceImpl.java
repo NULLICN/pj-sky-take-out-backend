@@ -12,6 +12,7 @@ import xyz.nullicn.dto.DishDTO;
 import xyz.nullicn.dto.DishPageQueryDTO;
 import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.DishFlavor;
+import xyz.nullicn.exception.BaseException;
 import xyz.nullicn.exception.DeletionNotAllowedException;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.skytakeserver.mapper.DishFlavorMapper;
@@ -137,5 +138,22 @@ public class DishServiceImpl implements DishService {
     public List<Dish> getDishesByCategoryId(Long categoryId) {
         List<Dish> dishList = dishMapper.getByCategoryId(categoryId);
         return dishList;
+    }
+
+    @Override
+    public void status(int status, Long id) {
+        if (id <= 0) {
+            throw new BaseException("菜品ID必须为正整数");
+        }
+        if (status != 0 && status != 1) {
+            throw new BaseException("状态值必须为0或1");
+        }
+
+        Dish dish = Dish.builder()
+                .status(status)
+                .id(id)
+                .build();
+
+        dishMapper.update(dish);
     }
 }

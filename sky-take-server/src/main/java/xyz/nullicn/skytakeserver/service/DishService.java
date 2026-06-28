@@ -20,4 +20,6 @@ public interface DishService {
     DishVO getDByIdWithFlavor(Long id);
 
     List<Dish> getDishesByCategoryId(Long categoryId);
+
+    void status(int status, Long id);
 }

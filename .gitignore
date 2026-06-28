@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment ###
+.env
+application-dev.yml
+!application-dev.example.yml
