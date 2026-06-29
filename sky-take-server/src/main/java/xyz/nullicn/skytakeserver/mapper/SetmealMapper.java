@@ -1,6 +1,7 @@
 package xyz.nullicn.skytakeserver.mapper;
 
 import com.github.pagehelper.Page;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import xyz.nullicn.dto.SetmealPageQueryDTO;
@@ -39,4 +40,7 @@ public interface SetmealMapper {
 
     @AutoFill(OperationType.UPDATE)
     void update(Setmeal setmeal);
+
+    @Delete("delete from setmeal_dish where setmeal_id = #{setmealId}")
+    void deleteDishesBySetmealId(Long setmealId);
 }

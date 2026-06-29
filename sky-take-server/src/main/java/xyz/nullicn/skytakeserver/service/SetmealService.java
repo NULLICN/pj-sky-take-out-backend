@@ -13,4 +13,6 @@ public interface SetmealService {
     PageResult page(SetmealPageQueryDTO setmealPageQueryDTO);
 
     void status(int status, Long id);
+
+    void update(SetmealDTO setmealDTO);
 }

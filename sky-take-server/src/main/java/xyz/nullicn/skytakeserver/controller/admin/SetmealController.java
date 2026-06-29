@@ -3,6 +3,7 @@ package xyz.nullicn.skytakeserver.controller.admin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +33,7 @@ public class SetmealController {
 
     @PostMapping
     @Operation(summary = "新增套餐", description = "新增一个套餐和其套餐菜品")
-    public Result<String> addSetmeal(@RequestBody SetmealDTO setmealDTO) {
+    public Result<String> addSetmeal(@RequestBody @Valid SetmealDTO setmealDTO) {
         log.info("新增套餐: {}", setmealDTO);
         setmealService.addSetmeal(setmealDTO);
         return Result.success();
@@ -57,6 +58,13 @@ public class SetmealController {
     @Operation(summary = "停售起售套餐", description = "操作id套餐装填，1为起售，0为停售")
     public Result<String> status(@PathVariable int status, @Parameter Long id) {
         setmealService.status(status, id);
+        return Result.success();
+    }
+
+    @PutMapping
+    @Operation(summary = "套餐修改", description = "更新套餐和套餐菜品")
+    public Result<String> update(@RequestBody @Valid SetmealDTO setmealDTO) {
+        setmealService.update(setmealDTO);
         return Result.success();
     }
 }

@@ -35,9 +35,6 @@ public class SetmealServiceImpl implements SetmealService {
     @Override
     @Transactional
     public void addSetmeal(SetmealDTO setmealDTO) {
-        // 根据分类id查询该分类下的所有菜品
-        List<Dish> dishes = dishMapper.getByCategoryId(setmealDTO.getCategoryId());
-
         // 构建套餐实体并插入
         Setmeal setmeal = Setmeal.builder()
                 .categoryId(setmealDTO.getCategoryId())
@@ -111,5 +108,28 @@ public class SetmealServiceImpl implements SetmealService {
 
         setmealMapper.update(setmeal);
 
+    }
+
+    @Override
+    @Transactional
+    public void update(SetmealDTO setmealDTO) {
+        // 创建setmeal对象并更新数据库
+        Setmeal setmeal = Setmeal.builder()
+                .categoryId(setmealDTO.getCategoryId())
+                .id(setmealDTO.getId())
+                .name(setmealDTO.getName())
+                .price(setmealDTO.getPrice())
+                .status(setmealDTO.getStatus())
+                .description(setmealDTO.getDescription())
+                .image(setmealDTO.getImage())
+                .build();
+        setmealMapper.update(setmeal);
+        // 获取setmealDish内容并存入数据库
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        if (setmealDishes != null && !setmealDishes.isEmpty()) {
+            setmealMapper.deleteDishesBySetmealId(setmeal.getId());
+            setmealDishes.forEach(d -> d.setSetmealId(setmeal.getId()));
+            setmealMapper.insertBatch(setmealDishes);
+        }
     }
 }
