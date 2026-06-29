@@ -36,4 +36,7 @@ public interface SetmealMapper {
     List<SetmealDish> getSetmealDishesBySetmealId(Long setmealId);
 
     Page<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    @AutoFill(OperationType.UPDATE)
+    void update(Setmeal setmeal);
 }

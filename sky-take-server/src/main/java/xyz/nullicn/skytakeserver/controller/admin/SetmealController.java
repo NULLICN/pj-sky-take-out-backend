@@ -1,6 +1,7 @@
 package xyz.nullicn.skytakeserver.controller.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +51,12 @@ public class SetmealController {
     public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO) {
         PageResult pageResult = setmealService.page(setmealPageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    @PostMapping("/status/{status}")
+    @Operation(summary = "停售起售套餐", description = "操作id套餐装填，1为起售，0为停售")
+    public Result<String> status(@PathVariable int status, @Parameter Long id) {
+        setmealService.status(status, id);
+        return Result.success();
     }
 }

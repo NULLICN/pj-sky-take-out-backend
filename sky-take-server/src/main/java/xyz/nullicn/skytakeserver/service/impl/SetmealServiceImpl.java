@@ -11,6 +11,7 @@ import xyz.nullicn.entity.Category;
 import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.Setmeal;
 import xyz.nullicn.entity.SetmealDish;
+import xyz.nullicn.exception.BaseException;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.skytakeserver.mapper.CategoryMapper;
 import xyz.nullicn.skytakeserver.mapper.DishMapper;
@@ -92,5 +93,23 @@ public class SetmealServiceImpl implements SetmealService {
         List<SetmealVO> setmealVOList = aPage.getResult();
 
         return new PageResult(total, setmealVOList);
+    }
+
+    @Override
+    public void status(int status, Long id) {
+        if (id <= 0) {
+            throw new BaseException("套餐ID必须为正整数");
+        }
+        if (status != 0 && status != 1) {
+            throw new BaseException("状态值必须为0或1");
+        }
+
+        Setmeal setmeal = Setmeal.builder()
+                .status(status)
+                .id(id)
+                .build();
+
+        setmealMapper.update(setmeal);
+
     }
 }

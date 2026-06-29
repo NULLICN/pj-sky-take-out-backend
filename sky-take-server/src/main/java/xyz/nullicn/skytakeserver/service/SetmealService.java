@@ -11,4 +11,6 @@ public interface SetmealService {
     SetmealVO getById(Long id);
 
     PageResult page(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    void status(int status, Long id);
 }
