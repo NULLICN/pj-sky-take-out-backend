@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import xyz.nullicn.constant.MessageConstant;
 import xyz.nullicn.dto.SetmealDTO;
 import xyz.nullicn.dto.SetmealPageQueryDTO;
 import xyz.nullicn.entity.Category;
@@ -12,6 +13,7 @@ import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.Setmeal;
 import xyz.nullicn.entity.SetmealDish;
 import xyz.nullicn.exception.BaseException;
+import xyz.nullicn.exception.DeletionNotAllowedException;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.skytakeserver.mapper.CategoryMapper;
 import xyz.nullicn.skytakeserver.mapper.DishMapper;
@@ -130,6 +132,24 @@ public class SetmealServiceImpl implements SetmealService {
             setmealMapper.deleteDishesBySetmealId(setmeal.getId());
             setmealDishes.forEach(d -> d.setSetmealId(setmeal.getId()));
             setmealMapper.insertBatch(setmealDishes);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteBatchByIds(List<Long> ids) {
+        //检查套餐是否已起售
+        for (Long id : ids) {
+            int status = setmealMapper.getById(id).getStatus();
+            if(status == 1) {
+                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+            }
+        }
+        // 删除对应id的套餐
+        setmealMapper.deleteBatchByIds(ids);
+        // 删除套餐下的菜品（遍历）
+        for (Long id : ids) {
+            setmealMapper.deleteDishesBySetmealId(id);
         }
     }
 }

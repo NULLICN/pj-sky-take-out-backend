@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -65,6 +66,12 @@ public class SetmealController {
     @Operation(summary = "套餐修改", description = "更新套餐和套餐菜品")
     public Result<String> update(@RequestBody @Valid SetmealDTO setmealDTO) {
         setmealService.update(setmealDTO);
+        return Result.success();
+    }
+
+    @DeleteMapping
+    public Result<String> deleteBatchById(@RequestParam @NotNull List<Long> ids) {
+        setmealService.deleteBatchByIds(ids);
         return Result.success();
     }
 }

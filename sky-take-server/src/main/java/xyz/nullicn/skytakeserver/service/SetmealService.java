@@ -5,6 +5,8 @@ import xyz.nullicn.dto.SetmealPageQueryDTO;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.vo.SetmealVO;
 
+import java.util.List;
+
 public interface SetmealService {
     void addSetmeal(SetmealDTO setmealDTO);
 
@@ -15,4 +17,6 @@ public interface SetmealService {
     void status(int status, Long id);
 
     void update(SetmealDTO setmealDTO);
+
+    void deleteBatchByIds(List<Long> ids);
 }

@@ -3,7 +3,9 @@ package xyz.nullicn.skytakeserver.mapper;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import xyz.nullicn.dto.SetmealPageQueryDTO;
 import xyz.nullicn.entity.Setmeal;
 import xyz.nullicn.entity.SetmealDish;
@@ -43,4 +45,6 @@ public interface SetmealMapper {
 
     @Delete("delete from setmeal_dish where setmeal_id = #{setmealId}")
     void deleteDishesBySetmealId(Long setmealId);
+
+    void deleteBatchByIds(List<Long> ids);
 }
