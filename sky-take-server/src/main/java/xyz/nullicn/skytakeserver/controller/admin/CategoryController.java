@@ -61,7 +61,7 @@ public class CategoryController {
     @Operation(summary = "启用禁用分类", description = "根据分类ID启用或禁用分类，status为0禁用，1启用")
     @PostMapping("/status/{status}")
     public Result<String> startOrStop(@PathVariable("status") Integer status, @RequestParam Long id) {
-        log.info("启用禁用分类：status={}, id={}", status, id);
+        log.info("启用禁用分类：setStatus={}, id={}", status, id);
         categoryService.startOrStop(status, id);
         return Result.success();
     }

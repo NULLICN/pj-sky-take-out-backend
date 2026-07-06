@@ -90,7 +90,7 @@ public class EmployeeController {
     @PostMapping("/status/{status}")
     public Result<String> status(@PathVariable @NotNull(message = "状态值不能为空") Integer status,
                                   @RequestParam @NotNull(message = "员工ID不能为空") Long id) {
-        log.info("启用禁用员工账号：status={}, id={}", status, id);
+        log.info("启用禁用员工账号：setStatus={}, id={}", status, id);
         employeeService.updateStatus(status, id);
         return Result.success();
     }
