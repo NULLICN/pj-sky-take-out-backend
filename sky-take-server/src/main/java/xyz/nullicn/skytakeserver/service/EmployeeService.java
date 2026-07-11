@@ -45,6 +45,11 @@ public interface EmployeeService {
     Employee getEmployee(long id);
 
     /**
+     * 带缓存查询员工（@Cacheable 示例）
+     */
+    Employee getEmployeeCached(long id);
+
+    /**
      * 更新员工数据
      * @param employeeDTO 员工新数据
      */

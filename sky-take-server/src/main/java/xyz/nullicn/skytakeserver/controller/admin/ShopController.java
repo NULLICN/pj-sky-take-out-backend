@@ -14,20 +14,20 @@ import xyz.nullicn.skytakeserver.service.impl.ShopServiceImpl;
 public class ShopController {
 
     @Autowired
-    ShopServiceImpl shopServiceImpl;
+    ShopService shopService;
 
     @PutMapping("/{status}")
     @Operation(summary = "设置店铺经营状态", description = "1为营业 0为打样")
     public Result<String> setStatus(@PathVariable Integer status) {
         log.info("设定店铺经营状态: {}", status);
-        shopServiceImpl.setStatus(status);
+        shopService.setStatus(status);
         return Result.success();
     }
 
     @GetMapping("/status")
     @Operation(summary = "获取店铺经营状态", description = "1为营业 0为打样")
     public Result<Integer> getStatus() {
-        Integer status = shopServiceImpl.getStatus();
+        Integer status = shopService.getStatus();
         log.info("获取店铺经营状态: {}", status);
         return Result.success(status);
     }

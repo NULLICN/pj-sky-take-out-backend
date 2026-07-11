@@ -69,9 +69,15 @@ sky:
     admin-ttl: 0  # 0表示永久有效
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+    user-secret-key: ${SKY_JWT_USER_SECRET_KEY}
+    user-token-name: authentication
+    user-ttl: 7200000  # 2小时，单位毫秒
 
   alioss:
     access-key-id: ${SKY_ALIOSS_ACCESS_KEY_ID}
     access-key-secret: ${SKY_ALIOSS_ACCESS_KEY_SECRET}
     bucket-name: ${SKY_ALIOSS_BUCKET_NAME}
     endpoint: ${SKY_ALIOSS_ENDPOINT}
+  wechat:
+    appid: ${SKY_WECHAT_APPID}
+    secret: ${SKY_WECHAT_SECRET}

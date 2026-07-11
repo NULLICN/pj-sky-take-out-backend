@@ -9,12 +9,14 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.entity.Setmeal;
+import xyz.nullicn.skytakeserver.mapper.EmployeeMapper;
 import xyz.nullicn.skytakeserver.mapper.SetmealMapper;
 import xyz.nullicn.skytakeserver.service.EmployeeService;
 import xyz.nullicn.skytakeserver.service.SetmealService;
 import xyz.nullicn.utils.PasswordUtil;
 import xyz.nullicn.vo.SetmealVO;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +31,9 @@ class SkyTakeServerApplicationTests {
 
     @Autowired
     SetmealMapper setmealMapper;
+
+    @Autowired
+    EmployeeMapper employeeMapper;
 
     @Autowired
     RedisTemplate<String, Object> redisTemplate;
@@ -146,5 +151,51 @@ class SkyTakeServerApplicationTests {
         Set<Object> zset2 = stringObjectZSetOperations.range("zset1", 0, -1);
 
         System.out.println("zset2: " + zset2);
+    }
+
+    // ==================== 缓存访问示例 ====================
+
+    @Test
+    void testCacheAside() {
+        long id = 1L;
+        String cacheKey = "cache:employee:" + id;
+
+        // 1. 先查 Redis 缓存
+        Employee employee = (Employee) redisTemplate.opsForValue().get(cacheKey);
+
+        if (employee != null) {
+            System.out.println(">>> 缓存命中，直接返回 → " + employee.getName());
+            return;
+        }
+
+        // 2. 缓存未命中，查数据库
+        System.out.println(">>> 缓存未命中，查数据库...");
+        employee = employeeMapper.findById(id);
+
+        if (employee == null) {
+            System.out.println(">>> 数据库中也不存在");
+            return;
+        }
+
+        // 3. 数据库查到结果，写入 Redis 缓存（30分钟过期）
+        redisTemplate.opsForValue().set(cacheKey, employee, Duration.ofMinutes(30));
+        System.out.println(">>> 已写入缓存 → " + employee.getName());
+    }
+
+    /**
+     * 生产环境标准方式：@Cacheable 注解
+     * 调用两次，观察控制台输出 —— 第二次不会执行方法体
+     */
+    @Test
+    void testCacheable() {
+        long id = 1L;
+
+        System.out.println("=== 第 1 次调用（缓存未命中，会查库） ===");
+        Employee e1 = employeeService.getEmployeeCached(id);
+        System.out.println("结果: " + e1.getName());
+
+        System.out.println("=== 第 2 次调用（命中缓存，不查库） ===");
+        Employee e2 = employeeService.getEmployeeCached(id);
+        System.out.println("结果: " + e2.getName());
     }
 }

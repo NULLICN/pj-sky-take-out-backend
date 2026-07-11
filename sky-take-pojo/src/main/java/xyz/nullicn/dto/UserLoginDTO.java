@@ -1,5 +1,6 @@
 package xyz.nullicn.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 @Data
 public class UserLoginDTO implements Serializable {
 
+    @NotBlank(message = "凭证码code不能为空")
     private String code;
 
 }

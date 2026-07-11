@@ -2,8 +2,7 @@ package xyz.nullicn.skytakeserver.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.Cacheable;
 import xyz.nullicn.constant.MessageConstant;
 import xyz.nullicn.constant.PasswordConstant;
 import xyz.nullicn.constant.StatusConstant;
@@ -152,6 +151,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeMapper.findById(id);
         employee.setPassword("2778");
         return employee;
+    }
+
+    @Override
+    @Cacheable(value = "employee", key = "#id", unless = "#result == null")
+    public Employee getEmployeeCached(long id) {
+        return employeeMapper.findById(id);
     }
 
     @Override

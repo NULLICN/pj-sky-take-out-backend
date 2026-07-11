@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import xyz.nullicn.dto.DishDTO;
 import xyz.nullicn.dto.DishPageQueryDTO;
 import xyz.nullicn.entity.Dish;
+import xyz.nullicn.exception.BaseException;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.result.Result;
 import xyz.nullicn.skytakeserver.service.DishService;

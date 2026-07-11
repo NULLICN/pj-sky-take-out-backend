@@ -2,7 +2,7 @@ name: Deploy to Server
 
 on:
   push:
-    branches: [ main ]  # 推送到主分支时触发
+    branches: [ prod ]  # 推送到prod分支时触发
   # 也可以手动触发
   workflow_dispatch:
 

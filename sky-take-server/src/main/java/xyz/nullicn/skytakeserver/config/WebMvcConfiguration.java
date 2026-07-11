@@ -8,6 +8,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import xyz.nullicn.json.JacksonObjectMapper;
 import xyz.nullicn.skytakeserver.interceptor.JwtTokenAdminInterceptor;
+import xyz.nullicn.skytakeserver.interceptor.JwtTokenUserInterceptor;
+import xyz.nullicn.skytakeserver.interceptor.LoginRateLimitInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +28,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Autowired
     private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
 
+    @Autowired
+    private JwtTokenUserInterceptor jwtTokenUserInterceptor;
+
+    @Autowired
+    private LoginRateLimitInterceptor loginRateLimitInterceptor;
+
     /**
      * 注册自定义拦截器
      *
@@ -37,6 +45,15 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(jwtTokenAdminInterceptor)
                 .addPathPatterns("/admin/**")
                 .excludePathPatterns("/admin/employee/login");
+
+        registry.addInterceptor(jwtTokenUserInterceptor)
+                .addPathPatterns("/user/**")
+                .excludePathPatterns("/user/user/login")
+                .excludePathPatterns("/user/shop/status");
+
+        // 登录接口限流，仅作用于用户端与管理端登录入口
+        registry.addInterceptor(loginRateLimitInterceptor)
+                .addPathPatterns("/user/user/login", "/admin/employee/login");
     }
 
     /**

@@ -119,6 +119,9 @@ public class DishServiceImpl implements DishService {
     @Override
     public DishVO getDByIdWithFlavor(Long id) {
         Dish dish = dishMapper.getById(id);
+        if(dish == null) {
+            throw new BaseException(MessageConstant.DISH_NOT_EXISTS);
+        }
         List<DishFlavor> flavors = dishFlavorMapper.getBydishId(dish.getId());
         DishVO dishVO = DishVO.builder()
                 .id(dish.getId())
