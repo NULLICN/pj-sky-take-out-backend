@@ -2,7 +2,9 @@ package xyz.nullicn.skytakeserver.service;
 
 import xyz.nullicn.dto.SetmealDTO;
 import xyz.nullicn.dto.SetmealPageQueryDTO;
+import xyz.nullicn.entity.Setmeal;
 import xyz.nullicn.result.PageResult;
+import xyz.nullicn.vo.DishItemVO;
 import xyz.nullicn.vo.SetmealVO;
 
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.List;
 public interface SetmealService {
     void addSetmeal(SetmealDTO setmealDTO);
 
-    SetmealVO getById(Long id);
+    SetmealVO getSetmealById(Long id);
 
     PageResult page(SetmealPageQueryDTO setmealPageQueryDTO);
 
@@ -19,4 +21,8 @@ public interface SetmealService {
     void update(SetmealDTO setmealDTO);
 
     void deleteBatchByIds(List<Long> ids);
+
+    List<Setmeal> getSetmealsByCategoryId(Long categoryId);
+
+    List<DishItemVO> getDishesBySetmealId(Long id);
 }

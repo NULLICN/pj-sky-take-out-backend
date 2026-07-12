@@ -8,8 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import xyz.nullicn.constant.MessageConstant;
 import xyz.nullicn.dto.SetmealDTO;
 import xyz.nullicn.dto.SetmealPageQueryDTO;
-import xyz.nullicn.entity.Category;
-import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.Setmeal;
 import xyz.nullicn.entity.SetmealDish;
 import xyz.nullicn.exception.BaseException;
@@ -19,9 +17,10 @@ import xyz.nullicn.skytakeserver.mapper.CategoryMapper;
 import xyz.nullicn.skytakeserver.mapper.DishMapper;
 import xyz.nullicn.skytakeserver.mapper.SetmealMapper;
 import xyz.nullicn.skytakeserver.service.SetmealService;
-import xyz.nullicn.vo.DishVO;
+import xyz.nullicn.vo.DishItemVO;
 import xyz.nullicn.vo.SetmealVO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -57,7 +56,7 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
-    public SetmealVO getById(Long id) {
+    public SetmealVO getSetmealById(Long id) {
         // 查询套餐
         Setmeal setmeal = setmealMapper.getById(id);
         // 查询套餐关联的菜品
@@ -151,5 +150,19 @@ public class SetmealServiceImpl implements SetmealService {
         for (Long id : ids) {
             setmealMapper.deleteDishesBySetmealId(id);
         }
+    }
+
+    @Override
+    public List<Setmeal> getSetmealsByCategoryId(Long categoryId) {
+        List<Setmeal> setmeals = setmealMapper.getSetmealsByCategoryId(categoryId);
+        return setmeals;
+    }
+
+    @Override
+    public List<DishItemVO> getDishesBySetmealId(Long id) {
+        // 通过套餐id查询setmeal_dish与dish的联表
+        List<DishItemVO> dishes = setmealMapper.getDishesDetailBySetmealId(id);
+
+        return dishes;
     }
 }

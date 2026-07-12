@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.nullicn.dto.SetmealDTO;
 import xyz.nullicn.dto.SetmealPageQueryDTO;
-import xyz.nullicn.entity.Setmeal;
 import xyz.nullicn.result.PageResult;
 import xyz.nullicn.result.Result;
 import xyz.nullicn.skytakeserver.service.SetmealService;
@@ -22,7 +21,7 @@ import java.util.List;
 /**
  * 套餐管理
  */
-@RestController
+@RestController("adminSetmealController")
 @RequestMapping("/admin/setmeal")
 @Slf4j
 @Validated
@@ -44,7 +43,7 @@ public class SetmealController {
     @Operation(summary = "通过套餐id查询套餐", description = "查询一个套餐和其套餐菜品")
     public Result<SetmealVO> getSetmealById(@PathVariable Long id) {
         log.info("查询套餐id: {}", id);
-        SetmealVO setmealVO = setmealService.getById(id);
+        SetmealVO setmealVO = setmealService.getSetmealById(id);
         return Result.success(setmealVO);
     }
 

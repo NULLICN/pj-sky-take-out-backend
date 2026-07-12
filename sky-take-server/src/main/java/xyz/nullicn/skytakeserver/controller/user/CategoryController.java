@@ -2,6 +2,7 @@ package xyz.nullicn.skytakeserver.controller.user;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.List;
 @Slf4j
 @RestController("userCategoryController")
 @RequestMapping("/user/category")
+@Tag(name="C端-分类接口")
 public class CategoryController {
     @Autowired
     CategoryService categoryService;

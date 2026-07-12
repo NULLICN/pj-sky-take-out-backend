@@ -3,6 +3,7 @@ package xyz.nullicn.skytakeserver.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import xyz.nullicn.skytakeserver.mapper.SetmealMapper;
 import xyz.nullicn.skytakeserver.service.DishService;
 import xyz.nullicn.vo.DishVO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -158,5 +160,25 @@ public class DishServiceImpl implements DishService {
                 .build();
 
         dishMapper.update(dish);
+    }
+
+    @Override
+    public List<DishVO> listWithFlavor(Long categoryId) {
+        List<Dish> dishList = dishMapper.getByCategoryId(categoryId);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.getBydishId(d.getId());
+
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
     }
 }

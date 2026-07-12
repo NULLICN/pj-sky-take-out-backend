@@ -19,7 +19,7 @@ import xyz.nullicn.vo.DishVO;
 
 import java.util.List;
 
-@RestController
+@RestController("adminDishController")
 @RequestMapping("/admin/dish")
 @Slf4j
 @Validated

@@ -14,7 +14,6 @@ import java.util.List;
 @Data
 public class SetmealDTO implements Serializable {
 
-    @NotNull(message = "套餐ID不能为空")
     private Long id;
 
     //分类id

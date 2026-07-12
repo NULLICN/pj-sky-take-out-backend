@@ -7,10 +7,13 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import xyz.nullicn.dto.SetmealPageQueryDTO;
+import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.Setmeal;
 import xyz.nullicn.entity.SetmealDish;
 import xyz.nullicn.enumeration.OperationType;
 import xyz.nullicn.skytakeserver.annotation.AutoFill;
+import xyz.nullicn.vo.DishItemVO;
+import xyz.nullicn.vo.DishVO;
 import xyz.nullicn.vo.SetmealVO;
 
 import java.util.List;
@@ -47,4 +50,9 @@ public interface SetmealMapper {
     void deleteDishesBySetmealId(Long setmealId);
 
     void deleteBatchByIds(List<Long> ids);
+
+    @Select("select * from setmeal where category_id = #{categoryId} and status = 1")
+    List<Setmeal> getSetmealsByCategoryId(Long categoryId);
+
+    List<DishItemVO> getDishesDetailBySetmealId(Long setmealId);
 }
