@@ -5,6 +5,8 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.nullicn.constant.MessageConstant;
@@ -38,6 +40,7 @@ public class DishServiceImpl implements DishService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "dish", allEntries = true)
     public void addWithFlavor(DishDTO dishDTO) {
         Dish dish = Dish.builder()
                 .name(dishDTO.getName())
@@ -74,6 +77,7 @@ public class DishServiceImpl implements DishService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "dish", allEntries = true)
     public void deleteBatch(List<Long> ids) {
         // 检查菜品是否启用
         for (Long id : ids) {
@@ -98,6 +102,7 @@ public class DishServiceImpl implements DishService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "dish", allEntries = true)
     public void updateWithFlavor(DishDTO dishDTO) {
         Dish dish = Dish.builder()
                 .id(dishDTO.getId())
@@ -146,6 +151,7 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
+    @CacheEvict(value = "dish", allEntries = true)
     public void status(int status, Long id) {
         if (id <= 0) {
             throw new BaseException("菜品ID必须为正整数");
@@ -163,6 +169,7 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
+    @Cacheable(value = "dish", key = "#categoryId", unless = "#result == null || #result.isEmpty()")
     public List<DishVO> listWithFlavor(Long categoryId) {
         List<Dish> dishList = dishMapper.getByCategoryId(categoryId);
 

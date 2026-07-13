@@ -3,11 +3,11 @@ package xyz.nullicn.skytakeserver.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -20,6 +20,9 @@ import java.time.Duration;
 @Slf4j
 public class RedisConfiguration {
 
+    @Value("${spring.cache.redis.key-prefix:}")
+    private String keyPrefix;
+
     private ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -30,7 +33,7 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory){
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         log.info("开始创建redis模板类...");
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setKeySerializer(new StringRedisSerializer());
@@ -43,23 +46,40 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                // 统一过期时间 30 分钟
-                .entryTtl(Duration.ofMinutes(30))
-                // key 前缀
-                .prefixCacheNameWith("sky:")
-                // key 用字符串
-                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(
-                        new StringRedisSerializer()))
-                // value 用 JSON + 类型信息
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
-                        new GenericJackson2JsonRedisSerializer(createObjectMapper())))
-                // 不缓存 null 值
-                .disableCachingNullValues();
+    public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
+        GenericJackson2JsonRedisSerializer jsonSerializer =
+                new GenericJackson2JsonRedisSerializer(createObjectMapper());
 
-        return RedisCacheManager.builder(redisConnectionFactory)
-                .cacheDefaults(config)
-                .build();
+        return builder -> builder
+                .cacheDefaults(
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer))
+                                .prefixCacheNameWith(keyPrefix)
+                )
+                .withCacheConfiguration("dish",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer))
+                                .prefixCacheNameWith(keyPrefix)
+                                .entryTtl(Duration.ofMinutes(5))
+                )
+                .withCacheConfiguration("employee",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer))
+                                .prefixCacheNameWith(keyPrefix)
+                                .entryTtl(Duration.ofMinutes(30))
+                );
     }
+
+    // ======================== 统一 TTL 版本（无差异化过期时间） ========================
+    // @Bean
+    // public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
+    //     GenericJackson2JsonRedisSerializer jsonSerializer =
+    //             new GenericJackson2JsonRedisSerializer(createObjectMapper());
+    //
+    //     return builder -> builder.cacheDefaults(
+    //             RedisCacheConfiguration.defaultCacheConfig()
+    //                     .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer))
+    //                     .prefixCacheNameWith(keyPrefix)
+    //     );
+    // }
 }

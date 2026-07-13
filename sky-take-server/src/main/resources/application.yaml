@@ -12,6 +12,13 @@ spring:
     username: ${SKY_DATASOURCE_USERNAME}
     password: ${SKY_DATASOURCE_PASSWORD}
 
+  cache:
+    type: redis
+    redis:
+      time-to-live: 120s
+      key-prefix: "sky:"
+      cache-null-values: false
+
   data:
     redis:
       # Redis数据库索引(默认为0)
