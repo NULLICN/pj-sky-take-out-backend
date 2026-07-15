@@ -3,6 +3,8 @@ package xyz.nullicn.skytakeserver.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.nullicn.constant.MessageConstant;
@@ -35,6 +37,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"setmeal", "setmeal:Dishes"}, allEntries = true)
     public void addSetmeal(SetmealDTO setmealDTO) {
         // 构建套餐实体并插入
         Setmeal setmeal = Setmeal.builder()
@@ -94,6 +97,7 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
+    @CacheEvict(value = {"setmeal", "setmeal:Dishes"}, allEntries = true)
     public void status(int status, Long id) {
         if (id <= 0) {
             throw new BaseException("套餐ID必须为正整数");
@@ -113,6 +117,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"setmeal", "setmeal:Dishes"}, allEntries = true)
     public void update(SetmealDTO setmealDTO) {
         // 创建setmeal对象并更新数据库
         Setmeal setmeal = Setmeal.builder()
@@ -136,6 +141,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"setmeal", "setmeal:Dishes"}, allEntries = true)
     public void deleteBatchByIds(List<Long> ids) {
         //检查套餐是否已起售
         for (Long id : ids) {
@@ -153,12 +159,14 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
+    @Cacheable(value = "setmeal", key = "#categoryId", unless = "#result == null || #result.isEmpty()")
     public List<Setmeal> getSetmealsByCategoryId(Long categoryId) {
         List<Setmeal> setmeals = setmealMapper.getSetmealsByCategoryId(categoryId);
         return setmeals;
     }
 
     @Override
+    @Cacheable(value = "setmeal:Dishes", key = "#id", unless = "#result == null || #result.isEmpty()")
     public List<DishItemVO> getDishesBySetmealId(Long id) {
         // 通过套餐id查询setmeal_dish与dish的联表
         List<DishItemVO> dishes = setmealMapper.getDishesDetailBySetmealId(id);

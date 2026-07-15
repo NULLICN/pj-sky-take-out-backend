@@ -26,6 +26,7 @@ import xyz.nullicn.vo.DishVO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -176,6 +177,9 @@ public class DishServiceImpl implements DishService {
         List<DishVO> dishVOList = new ArrayList<>();
 
         for (Dish d : dishList) {
+            if(Objects.equals(d.getStatus(), StatusConstant.DISABLE)) {
+                continue;
+            }
             DishVO dishVO = new DishVO();
             BeanUtils.copyProperties(d,dishVO);
 

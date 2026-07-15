@@ -37,9 +37,8 @@ public class AutoFillAspect {
      * @param joinPoint
      */
     @Before("autoFillPointCut()")
-    public void autoFill(JoinPoint joinPoint){
+    public void autoFill(JoinPoint joinPoint) {
         log.info("开始公共字段填充");
-
 
         // 从方法签名上获取 @AutoFill 注解，读取操作类型（INSERT / UPDATE）
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
@@ -48,7 +47,7 @@ public class AutoFillAspect {
 
         // 软约定：被注解的 Mapper 方法第一个参数为要填充的实体对象
         Object[] args = joinPoint.getArgs();
-        if(args == null || args.length == 0){
+        if (args == null || args.length == 0) {
             return;
         }
         Object entity = args[0];
@@ -57,31 +56,36 @@ public class AutoFillAspect {
         LocalDateTime now = LocalDateTime.now();
         Long currentId = BaseContext.getCurrentId();
 
-        if(operationType == OperationType.INSERT) {
-            // INSERT 时同时填充 createTime/createUser 和 updateTime/updateUser
-            try {
-                Method setCreateTIme = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_CREATE_TIME, LocalDateTime.class);
-                Method setCreateUser = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_CREATE_USER, Long.class);
-                Method setUpdateTIme = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class);
-                Method setUpdateUser = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_USER, Long.class);
+        int matchedCount = 0;
 
-                setCreateTIme.invoke(entity, now);
-                setCreateUser.invoke(entity, currentId);
-                setUpdateTIme.invoke(entity, now);
-                setUpdateUser.invoke(entity, currentId);
-            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }else if(operationType == OperationType.UPDATE) {
-            // UPDATE 时仅填充 updateTime 和 updateUser
-            try {
-                Method setUpdateTIme = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class);
-                Method setUpdateUser = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_USER, Long.class);
-                setUpdateTIme.invoke(entity, now);
-                setUpdateUser.invoke(entity, currentId);
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
+        if (operationType == OperationType.INSERT) {
+            matchedCount += trySet(entity, AutoFillConstant.SET_CREATE_TIME, LocalDateTime.class, now);
+            matchedCount += trySet(entity, AutoFillConstant.SET_CREATE_USER, Long.class, currentId);
+            matchedCount += trySet(entity, AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class, now);
+            matchedCount += trySet(entity, AutoFillConstant.SET_UPDATE_USER, Long.class, currentId);
+        } else if (operationType == OperationType.UPDATE) {
+            matchedCount += trySet(entity, AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class, now);
+            matchedCount += trySet(entity, AutoFillConstant.SET_UPDATE_USER, Long.class, currentId);
+        }
+
+        if (matchedCount == 0) {
+            throw new RuntimeException("无任何一个方法得到匹配");
+        }
+    }
+
+    /**
+     * 尝试通过反射调用实体上的 setter 方法，实体没有该方法时静默跳过
+     * @return 1=方法存在且调用成功，0=方法不存在（NoSuchMethodException）
+     */
+    private int trySet(Object entity, String methodName, Class<?> paramType, Object value) {
+        try {
+            Method method = entity.getClass().getDeclaredMethod(methodName, paramType);
+            method.invoke(entity, value);
+            return 1;
+        } catch (NoSuchMethodException e) {
+            return 0;
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }

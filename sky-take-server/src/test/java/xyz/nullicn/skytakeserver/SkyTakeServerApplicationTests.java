@@ -7,10 +7,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.data.redis.core.DefaultTypedTuple;
+import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.entity.Setmeal;
+import xyz.nullicn.skytakeserver.mapper.DishMapper;
 import xyz.nullicn.skytakeserver.mapper.EmployeeMapper;
 import xyz.nullicn.skytakeserver.mapper.SetmealMapper;
+import xyz.nullicn.skytakeserver.service.DishService;
 import xyz.nullicn.skytakeserver.service.EmployeeService;
 import xyz.nullicn.skytakeserver.service.SetmealService;
 import xyz.nullicn.utils.PasswordUtil;
@@ -37,6 +40,10 @@ class SkyTakeServerApplicationTests {
 
     @Autowired
     RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    private DishService dishService;
+    @Autowired
+    private DishMapper dishMapper;
 
     @Test
     void contextLoads() {
@@ -197,5 +204,16 @@ class SkyTakeServerApplicationTests {
         System.out.println("=== 第 2 次调用（命中缓存，不查库） ===");
         Employee e2 = employeeService.getEmployeeCached(id);
         System.out.println("结果: " + e2.getName());
+    }
+
+    @Test
+    void testDishCache() {
+        dishService.listWithFlavor(17L);
+    }
+
+    @Test
+    void testGetDish() {
+        Dish dish = dishMapper.getById(46L);
+        System.out.println(dish);
     }
 }

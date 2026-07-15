@@ -23,6 +23,9 @@ public class RedisConfiguration {
     @Value("${spring.cache.redis.key-prefix:}")
     private String keyPrefix;
 
+    @Value("${spring.cache.redis.time-to-live:120s}")
+    private Duration defaultTtl;
+
     private ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -55,6 +58,7 @@ public class RedisConfiguration {
                         RedisCacheConfiguration.defaultCacheConfig()
                                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer))
                                 .prefixCacheNameWith(keyPrefix)
+                                .entryTtl(defaultTtl)
                 )
                 .withCacheConfiguration("dish",
                         RedisCacheConfiguration.defaultCacheConfig()
