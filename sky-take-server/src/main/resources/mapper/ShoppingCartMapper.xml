@@ -12,4 +12,36 @@
                 #{number}, #{amount}, #{image}, #{createTime})
         on duplicate key update number = number + 1
     </insert>
+    <update id="sub" parameterType="xyz.nullicn.entity.ShoppingCart">
+        update shopping_cart set number=number-1
+        <where>
+            user_id = #{userId} and number > 0
+            <if test="dishId != null and dishId > 0">and dish_id = #{dishId}</if>
+            <if test="dishFlavor != null and dishFlavor != ''">and dish_flavor = #{dishFlavor}</if>
+            <if test="setmealId != null and setmealId > 0">and setmeal_id = #{setmealId}</if>
+        </where>
+    </update>
+
+    <select id="getByCondition" parameterType="xyz.nullicn.entity.ShoppingCart"
+            resultType="xyz.nullicn.entity.ShoppingCart">
+        select * from shopping_cart
+        <where>
+            user_id = #{userId}
+            <if test="dishId != null and dishId > 0">and dish_id = #{dishId}</if>
+            <if test="dishFlavor != null and dishFlavor != ''">and dish_flavor = #{dishFlavor}</if>
+            <if test="setmealId != null and setmealId > 0">and setmeal_id = #{setmealId}</if>
+        </where>
+        limit 1
+    </select>
+
+    <delete id="deleteByCondition" parameterType="xyz.nullicn.entity.ShoppingCart">
+        delete from shopping_cart
+        <where>
+            user_id = #{userId}
+            <if test="dishId != null and dishId > 0">and dish_id = #{dishId}</if>
+            <if test="dishFlavor != null and dishFlavor != ''">and dish_flavor = #{dishFlavor}</if>
+            <if test="setmealId != null and setmealId > 0">and setmeal_id = #{setmealId}</if>
+        </where>
+    </delete>
+
 </mapper>

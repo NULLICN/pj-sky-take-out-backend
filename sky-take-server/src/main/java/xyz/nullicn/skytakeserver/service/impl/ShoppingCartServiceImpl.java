@@ -1,6 +1,7 @@
 package xyz.nullicn.skytakeserver.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.nullicn.constant.MessageConstant;
@@ -15,6 +16,8 @@ import xyz.nullicn.skytakeserver.mapper.SetmealMapper;
 import xyz.nullicn.skytakeserver.mapper.ShoppingCartMapper;
 import xyz.nullicn.skytakeserver.service.ShoppingCartService;
 
+import java.util.List;
+
 @Service
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
@@ -24,6 +27,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private SetmealMapper setmealMapper;
     @Autowired
     private ShoppingCartMapper shoppingCartMapper;
+
+    @Autowired
+    RedisTemplate<String, Object> redisTemplate;
+
+    private final String SHOPPING_CART_KEY = "shoppingCart";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -68,7 +76,70 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                    .amount(setmeal.getPrice())
                    .image(setmeal.getImage());
         }
-
         shoppingCartMapper.insert(builder.build());
+
+        // 添加新商品后删除旧的购物车缓存
+        deleteUserShoppingCartCache(userId);
     }
+
+    @Override
+    public List<ShoppingCart> list() {
+        Long userId = BaseContext.getCurrentId();
+        List<ShoppingCart> list = shoppingCartMapper.list(userId);
+        redisTemplate.opsForValue().set(SHOPPING_CART_KEY + ":" + userId, list);
+        return list;
+    }
+
+    @Override
+    public void clean() {
+        Long userId = BaseContext.getCurrentId();
+
+        // 清空购物车同时也清空缓存
+        deleteUserShoppingCartCache(userId);
+        shoppingCartMapper.clean(userId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void sub(ShoppingCartDTO shoppingCartDTO) {
+        Long userId = BaseContext.getCurrentId();
+
+        Long dishId = shoppingCartDTO.getDishId();
+        Long setmealId = shoppingCartDTO.getSetmealId();
+
+        boolean hasDish = dishId != null && dishId > 0;
+        boolean hasSetmeal = setmealId != null && setmealId > 0;
+
+        if (hasDish && hasSetmeal) {
+            throw new BaseException(MessageConstant.DISH_SETMEAL_INCOMPATIBLE);
+        }
+        if (!hasDish && !hasSetmeal) {
+            throw new BaseException(MessageConstant.DISH_SETMEAL_EMPTY);
+        }
+
+        ShoppingCart shoppingCart = ShoppingCart.builder()
+                .userId(userId)
+                .dishId(dishId)
+                .dishFlavor(shoppingCartDTO.getDishFlavor())
+                .setmealId(setmealId)
+                .build();
+
+        ShoppingCart existing = shoppingCartMapper.getByCondition(shoppingCart);
+        if (existing == null) {
+            throw new BaseException(MessageConstant.SHOPPING_CART_ITEM_NOT_FOUND);
+        }
+
+        if (existing.getNumber() <= 1) {
+            shoppingCartMapper.deleteByCondition(shoppingCart);
+        } else {
+            shoppingCartMapper.sub(shoppingCart);
+        }
+
+        deleteUserShoppingCartCache(userId);
+    }
+
+    private void deleteUserShoppingCartCache(Long userId) {
+        redisTemplate.delete(SHOPPING_CART_KEY + ":" + userId);
+    }
+
 }
