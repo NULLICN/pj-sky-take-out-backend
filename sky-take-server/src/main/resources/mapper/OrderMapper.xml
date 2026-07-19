@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xyz.nullicn.skytakeserver.mapper.OrderMapper">
+
+    <resultMap id="orderWithDetailsMap" type="xyz.nullicn.dto.OrdersDTO">
+        <id column="id" property="id"/>
+        <result column="number" property="number"/>
+        <result column="status" property="status"/>
+        <result column="user_id" property="userId"/>
+        <result column="address_book_id" property="addressBookId"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="checkout_time" property="checkoutTime"/>
+        <result column="pay_method" property="payMethod"/>
+        <result column="amount" property="amount"/>
+        <result column="remark" property="remark"/>
+        <result column="user_name" property="userName"/>
+        <result column="phone" property="phone"/>
+        <result column="address" property="address"/>
+        <result column="consignee" property="consignee"/>
+        <collection property="orderDetails" ofType="xyz.nullicn.entity.OrderDetail">
+            <id column="od_id" property="id"/>
+            <result column="od_name" property="name"/>
+            <result column="od_order_id" property="orderId"/>
+            <result column="od_dish_id" property="dishId"/>
+            <result column="od_setmeal_id" property="setmealId"/>
+            <result column="od_dish_flavor" property="dishFlavor"/>
+            <result column="od_number" property="number"/>
+            <result column="od_amount" property="amount"/>
+            <result column="od_image" property="image"/>
+        </collection>
+    </resultMap>
+
+    <select id="getById" resultMap="orderWithDetailsMap">
+        SELECT o.*,
+               od.id           AS od_id,
+               od.name         AS od_name,
+               od.order_id     AS od_order_id,
+               od.dish_id      AS od_dish_id,
+               od.setmeal_id   AS od_setmeal_id,
+               od.dish_flavor  AS od_dish_flavor,
+               od.number       AS od_number,
+               od.amount       AS od_amount,
+               od.image        AS od_image
+        FROM orders o
+                 LEFT JOIN order_detail od ON o.id = od.order_id
+        WHERE o.id = #{id}
+          AND o.user_id = #{userId}
+    </select>
+
+    <!--完成分页sql定义-->
+    <select id="pageQuery" resultMap="orderWithDetailsMap">
+        SELECT o.*,
+               od.id           AS od_id,
+               od.name         AS od_name,
+               od.order_id     AS od_order_id,
+               od.dish_id      AS od_dish_id,
+               od.setmeal_id   AS od_setmeal_id,
+               od.dish_flavor  AS od_dish_flavor,
+               od.number       AS od_number,
+               od.amount       AS od_amount,
+               od.image        AS od_image
+        FROM orders o
+                 LEFT JOIN order_detail od ON o.id = od.order_id
+        WHERE o.user_id = #{userId}
+        <if test="status != null">
+            AND o.status = #{status}
+        </if>
+        ORDER BY o.order_time DESC
+    </select>
+
+</mapper>

@@ -35,6 +35,9 @@
             <if test="label != null">
                 label = #{label},
             </if>
+            <if test="isDefault != null">
+                is_default = #{isDefault},
+            </if>
         </set>
         where id = #{id} and user_id = #{userId}
     </update>

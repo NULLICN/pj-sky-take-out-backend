@@ -16,6 +16,7 @@ import xyz.nullicn.skytakeserver.mapper.SetmealMapper;
 import xyz.nullicn.skytakeserver.mapper.ShoppingCartMapper;
 import xyz.nullicn.skytakeserver.service.ShoppingCartService;
 
+import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -31,7 +32,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Autowired
     RedisTemplate<String, Object> redisTemplate;
 
-    private final String SHOPPING_CART_KEY = "shoppingCart";
+    private static final String SHOPPING_CART_KEY = "shoppingCart";
+    private static final Duration CACHE_TTL = Duration.ofMinutes(30);
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -83,10 +85,20 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<ShoppingCart> list() {
         Long userId = BaseContext.getCurrentId();
+        String key = buildKey(userId);
+
+        List<ShoppingCart> cached = (List<ShoppingCart>) redisTemplate.opsForValue().get(key);
+        if (cached != null) {
+            return cached;
+        }
+
         List<ShoppingCart> list = shoppingCartMapper.list(userId);
-        redisTemplate.opsForValue().set(SHOPPING_CART_KEY + ":" + userId, list);
+        if(list != null && !(list.isEmpty())){
+            redisTemplate.opsForValue().set(key, list, CACHE_TTL);
+        }
         return list;
     }
 
@@ -138,8 +150,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         deleteUserShoppingCartCache(userId);
     }
 
+    private String buildKey(Long userId) {
+        return SHOPPING_CART_KEY + ":" + userId;
+    }
+
     private void deleteUserShoppingCartCache(Long userId) {
-        redisTemplate.delete(SHOPPING_CART_KEY + ":" + userId);
+        redisTemplate.delete(buildKey(userId));
     }
 
 }
