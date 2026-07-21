@@ -18,6 +18,11 @@
         <result column="phone" property="phone"/>
         <result column="address" property="address"/>
         <result column="consignee" property="consignee"/>
+        <result column="pack_amount" property="packAmount"/>
+        <result column="tableware_number" property="tablewareNumber"/>
+        <result column="tableware_status" property="tablewareStatus"/>
+        <result column="delivery_status" property="deliveryStatus"/>
+        <result column="estimated_delivery_time" property="estimatedDeliveryTime"/>
         <collection property="orderDetails" ofType="xyz.nullicn.entity.OrderDetail">
             <id column="od_id" property="id"/>
             <result column="od_name" property="name"/>
@@ -68,5 +73,19 @@
         </if>
         ORDER BY o.order_time DESC
     </select>
+
+    <select id="getByNumber" resultType="xyz.nullicn.entity.Orders">
+        SELECT * FROM orders WHERE number = #{number} AND user_id = #{userId}
+    </select>
+
+    <update id="update" parameterType="xyz.nullicn.entity.Orders">
+        UPDATE orders
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="payStatus != null">pay_status = #{payStatus},</if>
+            <if test="checkoutTime != null">checkout_time = #{checkoutTime},</if>
+        </set>
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
 
 </mapper>

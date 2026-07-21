@@ -36,6 +36,9 @@ public class OrdersDTO implements Serializable {
     //实收金额
     private BigDecimal amount;
 
+    //打包金额
+    private int packAmount;
+
     //备注
     private String remark;
 
@@ -50,6 +53,18 @@ public class OrdersDTO implements Serializable {
 
     //收货人
     private String consignee;
+
+    //餐具数量
+    private int tablewareNumber;
+
+    //餐具数量状态  1按餐量提供  0选择具体数量
+    private Integer tablewareStatus;
+
+    //配送状态  1立即送出  0选择具体时间
+    private Integer deliveryStatus;
+
+    //预计送达时间
+    private LocalDateTime estimatedDeliveryTime;
 
     private List<OrderDetail> orderDetails;
 

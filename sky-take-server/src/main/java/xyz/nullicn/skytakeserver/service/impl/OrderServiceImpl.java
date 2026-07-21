@@ -26,9 +26,9 @@ import xyz.nullicn.skytakeserver.service.AddressBookService;
 import xyz.nullicn.skytakeserver.service.OrderService;
 import xyz.nullicn.skytakeserver.service.ShoppingCartService;
 import xyz.nullicn.skytakeserver.service.UserService;
-import xyz.nullicn.vo.DishVO;
 import xyz.nullicn.vo.OrderPaymentVO;
 import xyz.nullicn.vo.OrderSubmitVO;
+import xyz.nullicn.vo.OrderVO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -58,8 +58,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderSubmitVO submit(OrdersSubmitDTO ordersSubmitDTO) {
         // 检查地址是否存在
-        AddressBook address = addressBookService.getById(ordersSubmitDTO.getAddressBookId());
-        if(address == null){
+        AddressBook checkAddress = addressBookService.getById(ordersSubmitDTO.getAddressBookId());
+        if(checkAddress == null){
             throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
         }
 
@@ -84,6 +84,11 @@ public class OrderServiceImpl implements OrderService {
 
         // 向订单表插入订单数据
         LocalDateTime now = LocalDateTime.now();
+        String address =
+                checkAddress.getProvinceName() + " " +
+                checkAddress.getCityName() + " " +
+                checkAddress.getDistrictName() + " " +
+                checkAddress.getDetail();
 
         Orders orders = orderConverter.toOrders(ordersSubmitDTO);
         orders.setStatus(Orders.PENDING_PAYMENT);
@@ -93,6 +98,13 @@ public class OrderServiceImpl implements OrderService {
         orders.setNumber("order" + now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")));
         orders.setPackAmount(packagingFee.intValue());
         orders.setAmount(totalAmount);
+        orders.setAddress(address);
+        orders.setConsignee(checkAddress.getConsignee());
+        orders.setPhone(checkAddress.getPhone());
+        orders.setTablewareNumber(ordersSubmitDTO.getTablewareNumber());
+        orders.setTablewareStatus(ordersSubmitDTO.getTablewareStatus());
+        orders.setDeliveryStatus(ordersSubmitDTO.getDeliveryStatus());
+        orders.setEstimatedDeliveryTime(ordersSubmitDTO.getEstimatedDeliveryTime());
         orderMapper.insert(orders);
 
         // 向订单明细插入购物车商品数据
@@ -132,9 +144,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderPaymentVO payment(OrdersPaymentDTO ordersPaymentDTO) {
         // 当前登录用户id
         Long userId = BaseContext.getCurrentId();
+
+        // 传入的订单号与userId做数据库查询，无结果则直接抛异常说明水平越权操作
+
 //        User user = userMapper.getById(userId);
 
         //调用微信支付接口，生成预支付交易单
@@ -153,6 +169,35 @@ public class OrderServiceImpl implements OrderService {
         OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
         vo.setPackageStr(jsonObject.getString("package"));
 
+        // 直接模拟支付成功
+        paySuccess(ordersPaymentDTO.getOrderNumber());
+
         return vo;
+    }
+
+    /**
+     * 模拟支付成功的微信回调 把订单状态更改为已支付
+     * @param outTradeNo
+     */
+    public void paySuccess(String outTradeNo) {
+
+        // 根据订单号查询订单
+        Orders ordersDB = orderMapper.getByNumber(outTradeNo, BaseContext.getCurrentId());
+
+        // 传入的订单号与userId做数据库查询，无结果则直接抛异常说明水平越权操作
+        if (ordersDB == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
+
+        // 根据订单id更新订单的状态、支付方式、支付状态、结账时间
+        Orders orders = Orders.builder()
+                .id(ordersDB.getId())
+                .status(Orders.TO_BE_CONFIRMED)
+                .payStatus(Orders.PAID)
+                .checkoutTime(LocalDateTime.now())
+                .userId(BaseContext.getCurrentId())
+                .build();
+
+        orderMapper.update(orders);
     }
 }

@@ -9,6 +9,7 @@ import xyz.nullicn.dto.OrdersDTO;
 import xyz.nullicn.entity.Orders;
 import xyz.nullicn.enumeration.OperationType;
 import xyz.nullicn.skytakeserver.annotation.AutoFill;
+import xyz.nullicn.vo.OrderVO;
 
 @Mapper
 public interface OrderMapper {
@@ -29,4 +30,8 @@ public interface OrderMapper {
     OrdersDTO getById(@Param("id") Long id, @Param("userId") Long userId);
 
     Page<OrdersDTO> pageQuery(@Param("status") Integer status, @Param("userId") Long userId);
+
+    Orders getByNumber(@Param("number") String number, @Param("userId") Long userId);
+
+    void update(Orders orders);
 }
