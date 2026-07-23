@@ -33,5 +33,5 @@ public interface OrderMapper {
 
     Orders getByNumber(@Param("number") String number, @Param("userId") Long userId);
 
-    void update(Orders orders);
+    int update(Orders orders);
 }

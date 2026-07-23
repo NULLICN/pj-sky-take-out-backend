@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 订单
@@ -108,4 +109,7 @@ public class Orders implements Serializable {
 
     //餐具数量状态  1按餐量提供  0选择具体数量
     private Integer tablewareStatus;
+
+    //乐观锁条件，仅用于UPDATE时的状态校验，不映射到数据库字段
+    private List<Integer> expectedStatuses;
 }

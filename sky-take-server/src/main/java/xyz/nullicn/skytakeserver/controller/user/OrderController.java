@@ -57,4 +57,12 @@ public class OrderController {
         log.info("生成预支付交易单：{}", orderPaymentVO);
         return Result.success(orderPaymentVO);
     }
+
+    @PutMapping("/cancel/{id}")
+    @Operation(summary = "取消订单")
+    public Result<String> cancel(@PathVariable Long id) {
+        log.info("取消订单 {}", id);
+        orderService.cancel(id);
+        return Result.success("取消成功");
+    }
 }

@@ -146,10 +146,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderPaymentVO payment(OrdersPaymentDTO ordersPaymentDTO) {
-        // 当前登录用户id
-        Long userId = BaseContext.getCurrentId();
+        // 传入的订单号与userId做数据库查询，无结果则直接抛异常说明水平越权操作
+        Orders ordersDB = orderMapper.getByNumber(ordersPaymentDTO.getOrderNumber(), BaseContext.getCurrentId());
 
         // 传入的订单号与userId做数据库查询，无结果则直接抛异常说明水平越权操作
+        if (ordersDB == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
 
 //        User user = userMapper.getById(userId);
 
@@ -175,29 +178,50 @@ public class OrderServiceImpl implements OrderService {
         return vo;
     }
 
+    @Override
+    public void cancel(Long id) {
+        Orders orders = Orders.builder()
+                .id(id)
+                .userId(BaseContext.getCurrentId())
+                .status(Orders.CANCELLED)
+                .cancelTime(LocalDateTime.now())
+                .expectedStatuses(List.of(Orders.PENDING_PAYMENT, Orders.TO_BE_CONFIRMED, Orders.CONFIRMED))
+                .build();
+
+        int row = orderMapper.update(orders);
+        if (row == 0) {
+            throw new OrderBusinessException("订单状态已变更，取消失败");
+        }
+    }
+
     /**
      * 模拟支付成功的微信回调 把订单状态更改为已支付
      * @param outTradeNo
      */
     public void paySuccess(String outTradeNo) {
-
         // 根据订单号查询订单
         Orders ordersDB = orderMapper.getByNumber(outTradeNo, BaseContext.getCurrentId());
-
-        // 传入的订单号与userId做数据库查询，无结果则直接抛异常说明水平越权操作
         if (ordersDB == null) {
             throw new OrderBusinessException("订单不存在");
         }
+        if (!ordersDB.getStatus().equals(Orders.PENDING_PAYMENT)) {
+            log.warn("订单状态异常，当前状态: {}, 订单号: {}", ordersDB.getStatus(), outTradeNo);
+            throw new OrderBusinessException("订单状态已变更，无法完成支付");
+        }
 
-        // 根据订单id更新订单的状态、支付方式、支付状态、结账时间
+        // 乐观锁：UPDATE时带上status前置条件，防止并发取消导致的丢失更新
         Orders orders = Orders.builder()
                 .id(ordersDB.getId())
                 .status(Orders.TO_BE_CONFIRMED)
                 .payStatus(Orders.PAID)
                 .checkoutTime(LocalDateTime.now())
+                .expectedStatuses(List.of(Orders.PENDING_PAYMENT))
                 .userId(BaseContext.getCurrentId())
                 .build();
 
-        orderMapper.update(orders);
+        int rows = orderMapper.update(orders);
+        if (rows == 0) {
+            throw new OrderBusinessException("订单状态已变更，支付失败");
+        }
     }
 }

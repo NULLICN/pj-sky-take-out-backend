@@ -16,4 +16,6 @@ public interface OrderService {
     PageResult page(int page, int pageSize, int status);
 
     OrderPaymentVO payment(OrdersPaymentDTO ordersPaymentDTO);
+
+    void cancel(Long id);
 }
