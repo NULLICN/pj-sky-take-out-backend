@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 @RestController("userOrderController")
 @RequestMapping("/user/order")
-@Tag(name = "订单接口")
+@Tag(name = "C端-订单接口")
 public class OrderController {
 
     @Autowired
@@ -64,5 +64,13 @@ public class OrderController {
         log.info("取消订单 {}", id);
         orderService.cancel(id);
         return Result.success("取消成功");
+    }
+
+    @PostMapping("/repetition/{id}")
+    @Operation(summary = "再来一单")
+    public Result<String> repetition(@PathVariable Long id) {
+        log.info("再来一单 {}", id);
+        orderService.repetition(id);
+        return Result.success();
     }
 }

@@ -10,7 +10,7 @@
                                    number, amount, image, create_time)
         values (#{name}, #{userId}, #{dishId}, #{setmealId}, #{dishFlavor},
                 #{number}, #{amount}, #{image}, #{createTime})
-        on duplicate key update number = number + 1
+        on duplicate key update number = number + #{number}
     </insert>
     <update id="sub" parameterType="xyz.nullicn.entity.ShoppingCart">
         update shopping_cart set number=number-1

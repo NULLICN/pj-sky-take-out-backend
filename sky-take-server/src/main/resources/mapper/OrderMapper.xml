@@ -23,6 +23,11 @@
         <result column="tableware_status" property="tablewareStatus"/>
         <result column="delivery_status" property="deliveryStatus"/>
         <result column="estimated_delivery_time" property="estimatedDeliveryTime"/>
+        <result column="delivery_time" property="deliveryTime"/>
+        <result column="pay_status" property="payStatus"/>
+        <result column="cancel_reason" property="cancelReason"/>
+        <result column="rejection_reason" property="rejectionReason"/>
+        <result column="cancel_time" property="cancelTime"/>
         <collection property="orderDetails" ofType="xyz.nullicn.entity.OrderDetail">
             <id column="od_id" property="id"/>
             <result column="od_name" property="name"/>
@@ -50,7 +55,9 @@
         FROM orders o
                  LEFT JOIN order_detail od ON o.id = od.order_id
         WHERE o.id = #{id}
-          AND o.user_id = #{userId}
+        <if test="userId != null">
+            AND o.user_id = #{userId}
+        </if>
     </select>
 
     <!--完成分页sql定义-->
@@ -78,6 +85,39 @@
         SELECT * FROM orders WHERE number = #{number} AND user_id = #{userId}
     </select>
 
+    <select id="conditionSearch" resultMap="orderWithDetailsMap">
+        SELECT o.*,
+               od.id           AS od_id,
+               od.name         AS od_name,
+               od.order_id     AS od_order_id,
+               od.dish_id      AS od_dish_id,
+               od.setmeal_id   AS od_setmeal_id,
+               od.dish_flavor  AS od_dish_flavor,
+               od.number       AS od_number,
+               od.amount       AS od_amount,
+               od.image        AS od_image
+        FROM orders o
+                 LEFT JOIN order_detail od ON o.id = od.order_id
+        <where>
+            <if test="number != null and number != ''">
+                AND o.number = #{number}
+            </if>
+            <if test="phone != null and phone != ''">
+                AND o.phone = #{phone}
+            </if>
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+            <if test="beginTime != null">
+                AND o.order_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                AND o.order_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY o.order_time DESC
+    </select>
+
     <update id="update" parameterType="xyz.nullicn.entity.Orders">
         UPDATE orders
         <set>
@@ -87,7 +127,10 @@
             <if test="cancelTime != null">cancel_time = #{cancelTime},</if>
             <if test="cancelReason != null">cancel_reason = #{cancelReason},</if>
         </set>
-        WHERE id = #{id} AND user_id = #{userId}
+        WHERE id = #{id}
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
         <if test="expectedStatuses != null and expectedStatuses.size() > 0">AND status IN
             <foreach collection="expectedStatuses" item="item" open="(" separator="," close=")">
                 #{item}

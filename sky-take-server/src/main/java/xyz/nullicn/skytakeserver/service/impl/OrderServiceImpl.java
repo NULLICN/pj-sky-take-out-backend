@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import xyz.nullicn.constant.MessageConstant;
 import xyz.nullicn.context.BaseContext;
 import xyz.nullicn.dto.OrdersDTO;
+import xyz.nullicn.dto.OrdersPageQueryDTO;
 import xyz.nullicn.dto.OrdersPaymentDTO;
 import xyz.nullicn.dto.OrdersSubmitDTO;
 import xyz.nullicn.entity.*;
@@ -133,14 +134,23 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public PageResult page(int page, int pageSize, int status) {
+        try (Page<OrdersDTO> ignored = PageHelper.startPage(page, pageSize)) {
+            Page<OrdersDTO> aPage = orderMapper.pageQuery(status == 0 ? null : status, BaseContext.getCurrentId());
+            return new PageResult(aPage.getTotal(), aPage.getResult());
+        }
+    }
 
-        PageHelper.startPage(page, pageSize);
-        Page<OrdersDTO> aPage = orderMapper.pageQuery(status == 0 ? null : status, BaseContext.getCurrentId());
+    @Override
+    public PageResult pageSearch(OrdersPageQueryDTO dto) {
+        try (Page<Orders> ignored = PageHelper.startPage(dto.getPage(), dto.getPageSize())) {
+            Page<Orders> aPage = orderMapper.conditionSearch(dto);
+            return new PageResult(aPage.getTotal(), aPage.getResult());
+        }
+    }
 
-        long total = aPage.getTotal();
-        List<OrdersDTO> orders = aPage.getResult();
-
-        return new PageResult(total, orders);
+    @Override
+    public OrdersDTO detail(Long id) {
+        return orderMapper.getById(id, null);
     }
 
     @Override
@@ -186,12 +196,27 @@ public class OrderServiceImpl implements OrderService {
                 .status(Orders.CANCELLED)
                 .cancelTime(LocalDateTime.now())
                 .expectedStatuses(List.of(Orders.PENDING_PAYMENT, Orders.TO_BE_CONFIRMED, Orders.CONFIRMED))
+                .cancelReason("用户主动取消")
                 .build();
 
         int row = orderMapper.update(orders);
         if (row == 0) {
             throw new OrderBusinessException("订单状态已变更，取消失败");
         }
+    }
+
+    @Override
+    @Transactional
+    public void repetition(Long id) {
+        // 检查水平越权
+        OrdersDTO ordersDB = orderMapper.getById(id, BaseContext.getCurrentId());
+        if(ordersDB == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
+        // 查询订单id下的商品内容存放到购物车内
+        List<OrderDetail> orderDetails = ordersDB.getOrderDetails();
+        // 此方法内部会判断商品不存在或停售则直接抛出异常并回滚数据库操作
+        shoppingCartService.addToCartBatch(orderDetails);
     }
 
     /**

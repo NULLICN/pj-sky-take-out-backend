@@ -29,4 +29,6 @@ public class MessageConstant {
     public static final String DISH_SETMEAL_INCOMPATIBLE = "菜品与套餐不能同时添加";
     public static final String DISH_SETMEAL_EMPTY = "菜品或套餐都未指定";
     public static final String SETMEAL_NOT_EXISTS = "套餐不存在";
+    public static final String DISH_IS_NOT_ON_SALE = "菜品已停售";
+    public static final String SETMEAL_IS_NOT_ON_SALE = "套餐已停售";
 }

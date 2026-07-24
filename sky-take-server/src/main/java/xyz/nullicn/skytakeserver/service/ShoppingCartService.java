@@ -2,6 +2,7 @@ package xyz.nullicn.skytakeserver.service;
 
 import org.springframework.stereotype.Service;
 import xyz.nullicn.dto.ShoppingCartDTO;
+import xyz.nullicn.entity.OrderDetail;
 import xyz.nullicn.entity.ShoppingCart;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface ShoppingCartService {
     void clean();
 
     void sub(ShoppingCartDTO shoppingCartDTO);
+
+    void addToCartBatch(List<OrderDetail> orderDetails);
 }

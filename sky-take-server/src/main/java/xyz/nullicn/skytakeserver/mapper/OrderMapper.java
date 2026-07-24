@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import xyz.nullicn.dto.OrdersDTO;
+import xyz.nullicn.dto.OrdersPageQueryDTO;
 import xyz.nullicn.entity.Orders;
 import xyz.nullicn.enumeration.OperationType;
 import xyz.nullicn.skytakeserver.annotation.AutoFill;
@@ -34,4 +35,6 @@ public interface OrderMapper {
     Orders getByNumber(@Param("number") String number, @Param("userId") Long userId);
 
     int update(Orders orders);
+
+    Page<Orders> conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO);
 }

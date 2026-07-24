@@ -66,6 +66,21 @@ public class OrdersDTO implements Serializable {
     //预计送达时间
     private LocalDateTime estimatedDeliveryTime;
 
+    //送达时间
+    private LocalDateTime deliveryTime;
+
+    //支付状态 0未支付 1已支付 2退款
+    private Integer payStatus;
+
+    //订单取消原因
+    private String cancelReason;
+
+    //订单拒绝原因
+    private String rejectionReason;
+
+    //订单取消时间
+    private LocalDateTime cancelTime;
+
     private List<OrderDetail> orderDetails;
 
 }
