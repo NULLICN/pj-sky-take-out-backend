@@ -2,6 +2,8 @@ package xyz.nullicn.skytakeserver.mapper;
 
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
+import java.time.LocalDateTime;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
@@ -10,6 +12,7 @@ import xyz.nullicn.dto.OrdersPageQueryDTO;
 import xyz.nullicn.entity.Orders;
 import xyz.nullicn.enumeration.OperationType;
 import xyz.nullicn.skytakeserver.annotation.AutoFill;
+import xyz.nullicn.vo.OrderStatisticsVO;
 import xyz.nullicn.vo.OrderVO;
 
 @Mapper
@@ -37,4 +40,22 @@ public interface OrderMapper {
     int update(Orders orders);
 
     Page<Orders> conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    OrderStatisticsVO statistics(@Param("employeeId") Long employeeId);
+
+    int adminCancel(@Param("id") Long id, @Param("cancelReason") String cancelReason,
+                    @Param("cancelTime") LocalDateTime cancelTime, @Param("status") Integer status,
+                    @Param("employeeId") Long employeeId);
+
+    int adminRejection(@Param("id") Long id, @Param("rejectionReason") String rejectionReason,
+                       @Param("status") Integer status, @Param("employeeId") Long employeeId);
+
+    int adminComplete(@Param("id") Long id, @Param("status") Integer status,
+                      @Param("employeeId") Long employeeId);
+
+    int adminConfirm(@Param("id") Long id, @Param("status") Integer status,
+                     @Param("employeeId") Long employeeId);
+
+    int adminDelivery(@Param("id") Long id, @Param("status") Integer status,
+                      @Param("employeeId") Long employeeId);
 }

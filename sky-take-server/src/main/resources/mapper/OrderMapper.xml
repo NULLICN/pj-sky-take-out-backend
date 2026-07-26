@@ -118,6 +118,52 @@
         ORDER BY o.order_time DESC
     </select>
 
+    <select id="statistics" resultType="xyz.nullicn.vo.OrderStatisticsVO">
+        SELECT COALESCE(SUM(CASE WHEN o.status = 2 THEN 1 ELSE 0 END), 0) AS toBeConfirmed,
+               COALESCE(SUM(CASE WHEN o.status = 3 THEN 1 ELSE 0 END), 0) AS confirmed,
+               COALESCE(SUM(CASE WHEN o.status = 4 THEN 1 ELSE 0 END), 0) AS deliveryInProgress
+        FROM orders o
+        WHERE EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </select>
+
+    <update id="adminComplete">
+        UPDATE orders
+        SET status = #{status}
+        WHERE id = #{id}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </update>
+
+    <update id="adminRejection">
+        UPDATE orders
+        SET rejection_reason = #{rejectionReason},
+            status           = #{status}
+        WHERE id = #{id}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </update>
+
+    <update id="adminDelivery">
+        UPDATE orders
+        SET status = #{status}
+        WHERE id = #{id}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </update>
+
+    <update id="adminConfirm">
+        UPDATE orders
+        SET status = #{status}
+        WHERE id = #{id}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </update>
+
+    <update id="adminCancel">
+        UPDATE orders
+        SET cancel_reason = #{cancelReason},
+            cancel_time   = #{cancelTime},
+            status        = #{status}
+        WHERE id = #{id}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </update>
+
     <update id="update" parameterType="xyz.nullicn.entity.Orders">
         UPDATE orders
         <set>

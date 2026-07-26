@@ -1,5 +1,6 @@
 package xyz.nullicn.skytakeserver.service.impl;
 
+import cn.hutool.db.sql.Order;
 import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -10,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.nullicn.constant.MessageConstant;
 import xyz.nullicn.context.BaseContext;
-import xyz.nullicn.dto.OrdersDTO;
-import xyz.nullicn.dto.OrdersPageQueryDTO;
-import xyz.nullicn.dto.OrdersPaymentDTO;
-import xyz.nullicn.dto.OrdersSubmitDTO;
+import xyz.nullicn.dto.*;
 import xyz.nullicn.entity.*;
 import xyz.nullicn.exception.AddressBookBusinessException;
 import xyz.nullicn.exception.OrderBusinessException;
@@ -28,6 +26,7 @@ import xyz.nullicn.skytakeserver.service.OrderService;
 import xyz.nullicn.skytakeserver.service.ShoppingCartService;
 import xyz.nullicn.skytakeserver.service.UserService;
 import xyz.nullicn.vo.OrderPaymentVO;
+import xyz.nullicn.vo.OrderStatisticsVO;
 import xyz.nullicn.vo.OrderSubmitVO;
 import xyz.nullicn.vo.OrderVO;
 
@@ -151,6 +150,53 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrdersDTO detail(Long id) {
         return orderMapper.getById(id, null);
+    }
+
+    @Override
+    public OrderStatisticsVO statistics() {
+        return orderMapper.statistics(BaseContext.getCurrentId());
+    }
+
+    @Override
+    public void adminCancel(String cancelReason, Long id) {
+        int rows = orderMapper.adminCancel(id, cancelReason, LocalDateTime.now(),
+                Orders.CANCELLED, BaseContext.getCurrentId());
+        if (rows == 0) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public void adminRejection(OrdersRejectionDTO ordersRejectionDTO) {
+        int rows = orderMapper.adminRejection(ordersRejectionDTO.getId(),
+                ordersRejectionDTO.getRejectionReason(), Orders.CANCELLED, BaseContext.getCurrentId());
+        if (rows == 0) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public void adminComplete(Long id) {
+        int rows = orderMapper.adminComplete(id, Orders.COMPLETED, BaseContext.getCurrentId());
+        if (rows == 0) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public void adminDelivery(Long id) {
+        int rows = orderMapper.adminDelivery(id, Orders.DELIVERY_IN_PROGRESS, BaseContext.getCurrentId());
+        if (rows == 0) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public void adminConfirm(OrdersConfirmDTO ordersConfirmDTO) {
+        int rows = orderMapper.adminConfirm(ordersConfirmDTO.getId(), Orders.CONFIRMED, BaseContext.getCurrentId());
+        if (rows == 0) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
     }
 
     @Override
