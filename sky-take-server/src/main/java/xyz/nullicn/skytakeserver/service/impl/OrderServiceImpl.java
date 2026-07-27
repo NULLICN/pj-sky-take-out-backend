@@ -1,6 +1,7 @@
 package xyz.nullicn.skytakeserver.service.impl;
 
 import cn.hutool.db.sql.Order;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -25,6 +26,7 @@ import xyz.nullicn.skytakeserver.service.AddressBookService;
 import xyz.nullicn.skytakeserver.service.OrderService;
 import xyz.nullicn.skytakeserver.service.ShoppingCartService;
 import xyz.nullicn.skytakeserver.service.UserService;
+import xyz.nullicn.skytakeserver.websocket.WebSocketServer;
 import xyz.nullicn.vo.OrderPaymentVO;
 import xyz.nullicn.vo.OrderStatisticsVO;
 import xyz.nullicn.vo.OrderSubmitVO;
@@ -33,7 +35,9 @@ import xyz.nullicn.vo.OrderVO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -52,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private ShoppingCartService shoppingCartService;
     @Autowired
-    private UserService userService;
+    private WebSocketServer webSocketServer;
 
     @Override
     @Transactional
@@ -269,6 +273,7 @@ public class OrderServiceImpl implements OrderService {
      * 模拟支付成功的微信回调 把订单状态更改为已支付
      * @param outTradeNo
      */
+    @Override
     public void paySuccess(String outTradeNo) {
         // 根据订单号查询订单
         Orders ordersDB = orderMapper.getByNumber(outTradeNo, BaseContext.getCurrentId());
@@ -294,5 +299,33 @@ public class OrderServiceImpl implements OrderService {
         if (rows == 0) {
             throw new OrderBusinessException("订单状态已变更，支付失败");
         }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("type",1); // 1表示来单提醒 2表示客户催单
+        map.put("orderId",ordersDB.getId());
+        map.put("content","订单号： " + outTradeNo);
+
+        String json = JSON.toJSONString(map);
+
+        webSocketServer.sendToAllClient(json);
+    }
+
+    @Override
+    public void reminder(Long id) {
+        OrdersDTO ordersDB = orderMapper.getById(id, BaseContext.getCurrentId());
+        if (ordersDB == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
+        if (!ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            throw new OrderBusinessException("订单状态异常，无法催单");
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", 2); // 1表示来单提醒 2表示客户催单
+        map.put("orderId", ordersDB.getId());
+        map.put("content", "订单号：" + ordersDB.getNumber());
+
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 }

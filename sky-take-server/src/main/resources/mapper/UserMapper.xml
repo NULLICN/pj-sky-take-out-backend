@@ -7,4 +7,22 @@
         insert into user (openid, name, phone, sex, id_number, avatar, create_time)
         values (#{openid}, #{name}, #{phone}, #{sex}, #{idNumber}, #{avatar}, #{createTime})
     </insert>
+
+    <select id="countUsersBeforeDate" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM user
+        WHERE create_time &lt; #{date}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </select>
+
+    <select id="getNewUserCountByDate" resultType="java.util.HashMap">
+        SELECT DATE(u.create_time)    AS user_date,
+               COUNT(*)               AS new_users
+        FROM user u
+        WHERE u.create_time &gt;= #{begin}
+          AND u.create_time &lt; #{end}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+        GROUP BY DATE(u.create_time)
+        ORDER BY user_date
+    </select>
 </mapper>

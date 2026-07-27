@@ -2,7 +2,9 @@ package xyz.nullicn.skytakeserver.mapper;
 
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -58,4 +60,24 @@ public interface OrderMapper {
 
     int adminDelivery(@Param("id") Long id, @Param("status") Integer status,
                       @Param("employeeId") Long employeeId);
+
+    int batchCancelTimeoutOrders(@Param("status") Integer status,
+                                 @Param("timeoutThreshold") LocalDateTime timeoutThreshold,
+                                 @Param("cancelledStatus") Integer cancelledStatus,
+                                 @Param("cancelReason") String cancelReason,
+                                 @Param("cancelTime") LocalDateTime cancelTime);
+
+    int batchCompleteDeliveryOrders(@Param("status") Integer status,
+                                    @Param("completedStatus") Integer completedStatus,
+                                    @Param("deliveryTime") LocalDateTime deliveryTime);
+
+    List<java.util.Map<String, Object>> getTurnoverByDate(@Param("begin") LocalDate begin,
+                                                           @Param("end") LocalDate end,
+                                                           @Param("status") Integer status,
+                                                           @Param("employeeId") Long employeeId);
+
+    List<java.util.Map<String, Object>> getOrderCountByDate(@Param("begin") LocalDate begin,
+                                                             @Param("end") LocalDate end,
+                                                             @Param("validStatus") Integer validStatus,
+                                                             @Param("employeeId") Long employeeId);
 }

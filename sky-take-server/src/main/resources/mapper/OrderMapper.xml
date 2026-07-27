@@ -164,6 +164,46 @@
           AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
     </update>
 
+    <update id="batchCancelTimeoutOrders">
+        UPDATE orders
+        SET status        = #{cancelledStatus},
+            cancel_reason = #{cancelReason},
+            cancel_time   = #{cancelTime}
+        WHERE status = #{status}
+          AND order_time &lt; #{timeoutThreshold}
+    </update>
+
+    <update id="batchCompleteDeliveryOrders">
+        UPDATE orders
+        SET status        = #{completedStatus},
+            delivery_time = #{deliveryTime}
+        WHERE status = #{status}
+    </update>
+
+    <select id="getTurnoverByDate" resultType="java.util.HashMap">
+        SELECT DATE(o.order_time)          AS order_date,
+               COALESCE(SUM(o.amount), 0) AS turnover
+        FROM orders o
+        WHERE o.status = #{status}
+          AND o.order_time &gt;= #{begin}
+          AND o.order_time &lt; #{end}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+        GROUP BY DATE(o.order_time)
+        ORDER BY order_date
+    </select>
+
+    <select id="getOrderCountByDate" resultType="java.util.HashMap">
+        SELECT DATE(o.order_time)                                           AS order_date,
+               COUNT(*)                                                     AS total_orders,
+               COALESCE(SUM(CASE WHEN o.status = #{validStatus} THEN 1 ELSE 0 END), 0) AS valid_orders
+        FROM orders o
+        WHERE o.order_time &gt;= #{begin}
+          AND o.order_time &lt; #{end}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+        GROUP BY DATE(o.order_time)
+        ORDER BY order_date
+    </select>
+
     <update id="update" parameterType="xyz.nullicn.entity.Orders">
         UPDATE orders
         <set>

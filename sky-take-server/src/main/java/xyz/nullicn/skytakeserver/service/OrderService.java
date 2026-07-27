@@ -35,4 +35,8 @@ public interface OrderService {
     void adminConfirm(OrdersConfirmDTO ordersConfirmDTO);
 
     void adminDelivery(Long id);
+
+    void paySuccess(String outTradeNo);
+
+    void reminder(Long id);
 }

@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.data.redis.core.DefaultTypedTuple;
+import org.springframework.scheduling.annotation.Scheduled;
 import xyz.nullicn.entity.Dish;
 import xyz.nullicn.entity.Employee;
 import xyz.nullicn.entity.Setmeal;

@@ -10,4 +10,17 @@
             (#{item.name}, #{item.orderId}, #{item.dishId}, #{item.setmealId}, #{item.dishFlavor}, #{item.number}, #{item.amount}, #{item.image})
         </foreach>
     </insert>
+
+    <select id="getTop10Sales" resultType="java.util.HashMap">
+        SELECT od.name, SUM(od.number) AS total_number
+        FROM order_detail od
+                 JOIN orders o ON od.order_id = o.id
+        WHERE o.status = #{status}
+          AND o.order_time &gt;= #{begin}
+          AND o.order_time &lt; #{end}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+        GROUP BY od.name
+        ORDER BY total_number DESC
+        LIMIT 10
+    </select>
 </mapper>
