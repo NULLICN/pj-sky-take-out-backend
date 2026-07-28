@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xyz.nullicn.skytakeserver.mapper.WorkspaceMapper">
+
+    <select id="getTodayTurnover" resultType="java.lang.Double">
+        SELECT COALESCE(SUM(o.amount), 0)
+        FROM orders o
+        WHERE o.status = #{status}
+          AND o.order_time &gt;= #{begin}
+          AND o.order_time &lt; #{end}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </select>
+
+    <select id="getTodayValidOrderCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM orders o
+        WHERE o.status = #{status}
+          AND o.order_time &gt;= #{begin}
+          AND o.order_time &lt; #{end}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </select>
+
+    <select id="getTodayTotalOrderCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM orders o
+        WHERE o.order_time &gt;= #{begin}
+          AND o.order_time &lt; #{end}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </select>
+
+    <select id="getTodayNewUsers" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM user u
+        WHERE u.create_time &gt;= #{begin}
+          AND u.create_time &lt; #{end}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </select>
+
+    <select id="countSetmealByStatus" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM setmeal
+        WHERE status = #{status}
+    </select>
+
+    <select id="countDishByStatus" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM dish
+        WHERE status = #{status}
+    </select>
+
+    <select id="getTodayOrderCountByStatus" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM orders o
+        WHERE o.status = #{status}
+          AND o.order_time &gt;= #{begin}
+          AND o.order_time &lt; #{end}
+          AND EXISTS (SELECT 1 FROM employee e WHERE e.id = #{employeeId})
+    </select>
+
+</mapper>

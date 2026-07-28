@@ -2,6 +2,7 @@ package xyz.nullicn.skytakeserver.controller.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,5 +55,11 @@ public class ReportController {
         log.info("查询TOP10商品榜单，日期范围：{} 至 {}", begin, end);
         SalesTop10ReportVO vo = reportService.getSalesTop10(begin, end);
         return Result.success(vo);
+    }
+
+    @GetMapping("/export")
+    @Operation(summary = "导出数据报表")
+    public void exportExcel(HttpServletResponse response) {
+        reportService.exportExcel(response);
     }
 }

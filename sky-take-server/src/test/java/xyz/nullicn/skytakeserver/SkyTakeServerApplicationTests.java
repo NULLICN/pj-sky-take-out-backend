@@ -21,6 +21,7 @@ import xyz.nullicn.utils.PasswordUtil;
 import xyz.nullicn.vo.SetmealVO;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -216,5 +217,11 @@ class SkyTakeServerApplicationTests {
     void testGetDish() {
         Dish dish = dishMapper.getById(46L);
         System.out.println(dish);
+    }
+
+    @Test
+    void todayDate() {
+        LocalDate today = LocalDate.now();
+        System.out.println("today: " + today.toString());
     }
 }
